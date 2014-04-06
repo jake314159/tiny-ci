@@ -8,7 +8,12 @@ class Result
         int returnValue;
         string returnString;
     public:
+        ~Result()
+        {
+            returnString.clear();
+        }
         int getReturnValue();
         string getReturnString();
         void setReturnValue(int);
+        void setReturnString(string);
 };

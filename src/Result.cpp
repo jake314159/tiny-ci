@@ -16,3 +16,7 @@ void Result::setReturnValue(int newValue)
     returnValue = newValue;
 }
 
+void Result::setReturnString(string newString)
+{
+    returnString = newString;
+}

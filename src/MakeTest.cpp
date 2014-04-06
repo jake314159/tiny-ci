@@ -1,10 +1,16 @@
 #include <string>
-
+#include <fstream>
+#include <streambuf>
 #include "MakeTest.h"
 
 using namespace std;
 
-#define MAKE_CHECK "make check 1> /dev/null 2> /dev/null"
+#define MAKE_CHECK "make check"
+#define MAKE "make"
+#define TEMP "/home/jake/git/tiny-ci/temp-tiny-ci.txt"
+#define PIPE_TO_TEMP " 1> '/home/jake/git/tiny-ci/temp-tiny-ci.txt' 2> '/home/jake/git/tiny-ci/temp-tiny-ci.txt'"
+
+#define RETURN_STRING_SIZE 1024
 
 int MakeTest::checkForChange()
 {
@@ -31,9 +37,23 @@ int MakeTest::performTest(Result &test)
     }
 
     //run command
-    std::string cmd = std::string("cd ") + dir + " && " + MAKE_CHECK;
-    value = system ((char*)cmd.c_str());
+    std::string cmd;
+    if(doTest) {
+        cmd = std::string("cd ") + dir + " && " + MAKE_CHECK + PIPE_TO_TEMP;
+    } else {
+        cmd = std::string("cd ") + dir + " && " + MAKE + PIPE_TO_TEMP;
+    }
+    cout << "Running: " << cmd << endl;
+    value = system((char*)cmd.c_str());
+
+    //Load the text from the tempory file
+    std::ifstream t(TEMP);
+    std::string str((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
+
+    remove(TEMP); //and delete it
 
     test.setReturnValue(value);
+    test.setReturnString(str);
+
     return value;
 }

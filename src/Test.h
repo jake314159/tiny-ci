@@ -22,6 +22,9 @@ class Test
 
 
         int performTest(Result&);
+        // 0    No changes
+        //!0    Some changes have been applied
+        int checkForChange();
 
         string getTestName()
         {

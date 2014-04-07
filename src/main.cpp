@@ -51,7 +51,7 @@ void addTaskToStore(MakeTest &t)
     }
 }
 
-int main(int argc, char *argv[])
+int start()
 {
     initHomeDir();
 
@@ -87,5 +87,28 @@ int main(int argc, char *argv[])
         }
         sleep(DELAY);
     }
+    return 0;
 }
 
+void printHelp()
+{
+    cout << "Did you mean 'tiny-ci start'?" << endl << endl;
+}
+
+int main(int argc, char *argv[])
+{
+    cout << "argc" << argc << endl;
+    if(argc <= 1) {
+        cout << "Not enough arguments!" << endl;
+        printHelp();
+        return 1;
+    }
+    if(!std::string(argv[1]).compare("start")) {
+        start();
+    } else {
+        cout << "Incorrect argument!" << endl;
+        printHelp();
+        return 1;
+    }
+    return 0;
+}

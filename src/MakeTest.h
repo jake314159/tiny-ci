@@ -24,6 +24,12 @@ class MakeTest: public Test
             this->url = url;
             doTest = doTestSet;
         }
+
+        void setLastHash(std::string nHash)
+        {
+            lastHash = nHash;
+        }
+
         int performTest(Result&);
         int checkForChange();
         void saveTest(FILE *fp);

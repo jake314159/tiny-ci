@@ -72,7 +72,7 @@ MakeTest MakeTest::parseSaveString(string inString)
     std::string s = inString;
     std::string delim = ";";
 
-    std::string parts[4];
+    std::string parts[5];
 
     unsigned int start = 0U;
     unsigned int end = s.find(delim, 0);

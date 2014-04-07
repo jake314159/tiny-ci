@@ -55,11 +55,20 @@ void updateTasksFromFile()
 {
     std::string taskFile = (std::string(gitRootDir) + "/.tasks");
     std::ifstream input( taskFile );
-    tests.clear();
     for( std::string line; getline( input, line ); )
     {
         MakeTest t = MakeTest::parseSaveString(line);
-        tests.push_back(t);
+        bool newTask = true;
+        for(int i=0; i<tests.size(); i++) {
+            //cout << "Comparing " << tests.at(i).getTestName() << " and " << t.getTestName() << endl;
+            if(!tests.at(i).getTestName().compare(t.getTestName())) {
+                newTask = false;
+                //cout << "They are the same!" << endl;
+            }
+        }
+        if(newTask) {
+            tests.push_back(t);
+        }
     }
 }
 

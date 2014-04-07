@@ -18,5 +18,6 @@ void Result::setReturnValue(int newValue)
 
 void Result::setReturnString(string newString)
 {
+    returnString.clear();
     returnString = newString;
 }

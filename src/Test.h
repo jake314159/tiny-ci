@@ -3,12 +3,20 @@
 #include "Result.h"
 using namespace std;
 
+enum TestMode {
+    PASS,
+    FAIL,
+    UNTESTED,
+    PAUSED
+};
+
 class Test
 {
     protected:
         string testName;
         int returnCode;
         string returnString;
+        TestMode mode = UNTESTED;
     public:
         Test(string testName)
         {
@@ -39,5 +47,20 @@ class Test
         int getReturnCode()
         {
             return returnCode;
+        }
+
+        TestMode getMode()
+        {
+            return mode;
+        }
+
+        void pause()
+        {
+            mode = PAUSED;
+        }
+
+        void unpause()
+        {
+            mode = UNTESTED;
         }
 };

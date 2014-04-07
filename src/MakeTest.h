@@ -1,3 +1,4 @@
+#include <fstream>
 #include "Test.h"
 #include "gitTools.h"
 using namespace std;
@@ -22,4 +23,5 @@ class MakeTest: public Test
         }
         int performTest(Result&);
         int checkForChange();
+        void saveTest(FILE *fp);
 };

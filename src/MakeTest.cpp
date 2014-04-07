@@ -2,15 +2,12 @@
 #include <fstream>
 #include <streambuf>
 #include "MakeTest.h"
+#include "dir.h"
 
 using namespace std;
 
 #define MAKE_CHECK "make check"
 #define MAKE "make"
-#define TEMP "/home/jake/git/tiny-ci/temp-tiny-ci.txt"
-#define PIPE_TO_TEMP " 1> '/home/jake/git/tiny-ci/temp-tiny-ci.txt' 2> '/home/jake/git/tiny-ci/temp-tiny-ci.txt'"
-
-#define RETURN_STRING_SIZE 1024
 
 int MakeTest::checkForChange()
 {
@@ -39,9 +36,9 @@ int MakeTest::performTest(Result &test)
     //run command
     std::string cmd;
     if(doTest) {
-        cmd = std::string("cd ") + dir + " && " + MAKE_CHECK + PIPE_TO_TEMP;
+        cmd = std::string("cd ") + dir + " && " + MAKE_CHECK + " 1> " + TEMP + " 2> " + TEMP;
     } else {
-        cmd = std::string("cd ") + dir + " && " + MAKE + PIPE_TO_TEMP;
+        cmd = std::string("cd ") + dir + " && " + MAKE + " 1> " + TEMP + " 2> " + TEMP;
     }
     cout << "Running: " << cmd << endl;
     value = system((char*)cmd.c_str());
@@ -52,8 +49,27 @@ int MakeTest::performTest(Result &test)
 
     remove(TEMP); //and delete it
 
+    if(value) {
+        mode = PASS;
+    } else {
+        mode = FAIL;
+    }
+
     test.setReturnValue(value);
     test.setReturnString(str);
 
     return value;
 }
+
+
+void MakeTest::saveTest(FILE *fp)
+{
+    /*taskStore << testName;
+    taskStore << TASK_STORE_SEP;
+    taskStore << dir;
+    taskStore << TASK_STORE_SEP;
+    taskStore << doTest << endl;*/
+    fprintf(fp,"%s;%s;%d\n",(char*)testName.c_str(), (char*)dir.c_str(), doTest);
+}
+
+

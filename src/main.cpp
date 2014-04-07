@@ -51,26 +51,26 @@ void addTaskToStore(MakeTest &t)
     }
 }
 
+void updateTasksFromFile()
+{
+    std::string taskFile = (std::string(gitRootDir) + "/.tasks");
+    std::ifstream input( taskFile );
+    tests.clear();
+    for( std::string line; getline( input, line ); )
+    {
+        MakeTest t = MakeTest::parseSaveString(line);
+        tests.push_back(t);
+    }
+}
+
 int start()
 {
-    initHomeDir();
-
-    MakeTest t0("tiny-ci", gitRootDir + "/tiny-ci", "git@github.com:jake314159/tiny-ci.git", false);
-    tests.push_back(t0);
-    MakeTest t1("markdown-latex", gitRootDir + "/markdown-latex", "git@github.com:jake314159/markdown-latex.git", true);
-    tests.push_back(t1);
-    MakeTest t2("avr-snake", gitRootDir + "/avr-snake", "git@github.com:jake314159/avr-snake.git", false);
-    tests.push_back(t2);
-    MakeTest t3("broken markdown-latex", "/home/jake/git/markdown-latex-fail-tests", "", true);
-    tests.push_back(t3);
-
-    /*for (int i=0; i<tests.size(); i++) {
-        addTaskToStore(tests.at(i));
-    }*/
+    updateTasksFromFile();
 
     Result r;
     
     while(true) {
+        updateTasksFromFile();
         int size = tests.size();
         for (int i=0; i<size; i++) {
             int check = tests.at(i).checkForChange();
@@ -97,6 +97,7 @@ void printHelp()
 
 int main(int argc, char *argv[])
 {
+    initHomeDir();
     cout << "argc" << argc << endl;
     if(argc <= 1) {
         cout << "Not enough arguments!" << endl;
@@ -105,6 +106,26 @@ int main(int argc, char *argv[])
     }
     if(!std::string(argv[1]).compare("start")) {
         start();
+    } else if(!std::string(argv[1]).compare("add")) {
+        if(argc < 4) {
+            cout << "Not enough arguments to make a new task" << endl;
+            printHelp();
+            return 1;
+        }
+        
+        bool runTest = false;
+        if(argc > 4 && !std::string(argv[4]).compare("true")) {
+            runTest = true;
+        }
+
+        cout << "Name:      " << argv[2] << endl;
+        cout << "Directory: " << gitRootDir + "/" + argv[2] << endl;
+        cout << "Git URL:   " << argv[3] << endl;
+        cout << "Run test:  " << runTest << endl << endl;
+
+        
+        MakeTest t(argv[2], gitRootDir + "/" + argv[2], argv[3], runTest);
+        addTaskToStore(t);
     } else {
         cout << "Incorrect argument!" << endl;
         printHelp();

@@ -64,12 +64,31 @@ int MakeTest::performTest(Result &test)
 
 void MakeTest::saveTest(FILE *fp)
 {
-    /*taskStore << testName;
-    taskStore << TASK_STORE_SEP;
-    taskStore << dir;
-    taskStore << TASK_STORE_SEP;
-    taskStore << doTest << endl;*/
-    fprintf(fp,"%s;%s;%d\n",(char*)testName.c_str(), (char*)dir.c_str(), doTest);
+    fprintf(fp,"%s;%s;%s;%d\n",(char*)testName.c_str(), (char*)dir.c_str(), (char*)url.c_str(), doTest);
 }
 
+MakeTest MakeTest::parseSaveString(string inString)
+{
+    std::string s = inString;
+    std::string delim = ";";
+
+    std::string parts[4];
+
+    unsigned int start = 0U;
+    unsigned int end = s.find(delim, 0);
+    int i=0;
+    while (i < 4 && end != std::string::npos)
+    {
+        parts[i] = s.substr(start, end - start);
+        i++;
+        start = end + delim.length();
+        end = s.find(delim, start);
+    }
+
+    bool doTest = true;
+    if(!parts[3].compare("0")) doTest = false;
+
+    MakeTest t0(parts[0], parts[1], parts[2], doTest);
+    return t0;
+}
 

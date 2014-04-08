@@ -2,15 +2,18 @@ using namespace std;
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include <unistd.h> //Unix timer. Note this makes this code Unix only!
+#include <unistd.h>    //Unix timer. Note this makes this code Unix only!
+
+#include <unistd.h>    // Used to get home directory (Unix only)
+#include <sys/types.h> // 
+#include <pwd.h>       //
+
 #include "MakeTest.h"
 #include "gitTools.h"
 #include "dir.h"
-#include <unistd.h>
-#include <sys/types.h>
-#include <pwd.h>
 
-//delay of 60s
+
+//delay between checks in seconds
 #define DELAY 60
 
 
@@ -59,7 +62,8 @@ void updateTasksFromFile()
     {
         MakeTest t = MakeTest::parseSaveString(line);
         bool newTask = true;
-        for(int i=0; i<tests.size(); i++) {
+        int size = tests.size();
+        for(int i=0; i<size; i++) {
             //cout << "Comparing " << tests.at(i).getTestName() << " and " << t.getTestName() << endl;
             if(!tests.at(i).getTestName().compare(t.getTestName())) {
                 newTask = false;
@@ -69,6 +73,28 @@ void updateTasksFromFile()
         if(newTask) {
             tests.push_back(t);
         }
+    }
+}
+
+void listTasks()
+{
+    updateTasksFromFile();
+    int size = tests.size();
+    for(int i=0; i<size; i++) {
+        MakeTest test = tests.at(i);
+        TestMode mode = test.getMode();
+        if(mode == PASS) {
+            cout << "[ PASS ]";
+        } else if(mode == FAIL) {
+            cout << "[ FAIL ]";
+        } else if(mode == UNTESTED) {
+            cout << "[      ]";
+        } else if(mode == PAUSED) {
+            cout << "[PAUSED]";
+        } else {
+            cout << "[ ERR  ]";
+        }
+        cout << "  " << test.getTestName() << endl;
     }
 }
 
@@ -101,7 +127,9 @@ int start()
 
 void printHelp()
 {
-    cout << "Did you mean 'tiny-ci start'?" << endl << endl;
+    cout << "Did you mean one of these?" << endl << endl
+            << "tiny-ci start             Starts the server program" << endl
+            << "tiny-ci add name gitURL   Adds a test to run" << endl << endl;
 }
 
 int main(int argc, char *argv[])
@@ -135,6 +163,8 @@ int main(int argc, char *argv[])
         
         MakeTest t(argv[2], gitRootDir + "/" + argv[2], argv[3], runTest);
         addTaskToStore(t);
+    } else if(!std::string(argv[1]).compare("list")) {
+        listTasks();
     } else {
         cout << "Incorrect argument!" << endl;
         printHelp();

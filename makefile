@@ -11,7 +11,7 @@ CC = g++
 CCFLAGS = -Wall -std=c++11
 
 all: $(BIN)/tiny-ci size
-check: all
+check: tester
 
 $(BIN)/tiny-ci: $(BIN)/main.o $(BIN)/Test.o $(BIN)/MakeTest.o $(BIN)/Result.o $(BIN)/gitTools.o
 	$(CC) $(CCFLAGS) $(BIN)/main.o $(BIN)/Test.o $(BIN)/MakeTest.o $(BIN)/Result.o $(BIN)/gitTools.o -o $(BIN)/$(FILE_OUT)
@@ -33,6 +33,16 @@ $(BIN)/gitTools.o: $(SRC)/gitTools.cpp $(BIN)
 
 $(BIN): 
 	mkdir -p $(BIN)
+
+tester: all tester.o testbindir
+	$(CC) testbin/tester.o $(BIN)/MakeTest.o $(BIN)/gitTools.o $(BIN)/Result.o -o testbin/tester
+	./testbin/tester
+
+tester.o: testbindir tests/tester.c
+	$(CC) $(CCFLAGS) -c tests/tester.c -o testbin/tester.o
+
+testbindir:
+	mkdir -p testbin
 
 size:
 	@echo

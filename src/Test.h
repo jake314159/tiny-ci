@@ -3,11 +3,12 @@
 #include "Result.h"
 using namespace std;
 
+// Numbers are fixed so we can be sure the values don't change between versions
 enum TestMode {
-    PASS,
-    FAIL,
-    UNTESTED,
-    PAUSED
+    PASS = 1,
+    FAIL = 0,
+    UNTESTED = 3,
+    PAUSED = 5
 };
 
 class Test

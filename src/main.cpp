@@ -8,6 +8,8 @@ using namespace std;
 #include <sys/types.h> // 
 #include <pwd.h>       //
 
+#include <time.h> //for the time
+
 #include "MakeTest.h"
 #include "gitTools.h"
 #include "dir.h"
@@ -34,11 +36,12 @@ void initHomeDir()
 
 int onFail(Result &result)
 {
-    cout << endl << "##############################################################" << 
+    //Prints the fail string (here as an example for when we wan't to use it properly)
+    /*cout << endl << "##############################################################" << 
             endl << "The test you have just run has failed! You better check it out" <<
             endl << "##############################################################" << 
             endl;
-    cout << result.getReturnString() << endl << endl;
+    cout << result.getReturnString() << endl << endl;*/
     return 0;
 }
 
@@ -109,23 +112,27 @@ int start()
         int size = tests.size();
         for (int i=0; i<size; i++) {
             int check = tests.at(i).checkForChange();
-            cout << "Check for change in " << tests.at(i).getTestName() << ": " << check << endl;
+
+            time_t rawtime;
+            time (&rawtime);
+
             if(check) {
                 if(tests.at(i).performTest(r)) {
                     onFail(r);
+                    cout << "[ FAIL ] " << tests.at(i).getTestName() << " failed on " << ctime (&rawtime); //ctime ends with a '\n'
+                } else {
+                    //Success
+                    cout << "[ PASS ] " << tests.at(i).getTestName() << " passed on " << ctime (&rawtime); //ctime ends with a '\n' 
                 }
-                cout << "Result output of the test is " << r.getReturnValue() << endl;
-            } else {
-                cout << "We don't need to run the test again" << endl;
             }
-            cout << endl << endl;
         }
+        cout << endl;
         sleep(DELAY);
     }
     return 0;
 }
 
-void printHelp()
+void printHelp()    
 {
     cout << "Did you mean one of these?" << endl << endl
             << "tiny-ci start             Starts the server program" << endl
@@ -135,12 +142,13 @@ void printHelp()
 int main(int argc, char *argv[])
 {
     initHomeDir();
-    cout << "argc" << argc << endl;
+
     if(argc <= 1) {
         cout << "Not enough arguments!" << endl;
         printHelp();
         return 1;
     }
+
     if(!std::string(argv[1]).compare("start")) {
         start();
     } else if(!std::string(argv[1]).compare("add")) {
@@ -170,5 +178,6 @@ int main(int argc, char *argv[])
         printHelp();
         return 1;
     }
+
     return 0;
 }

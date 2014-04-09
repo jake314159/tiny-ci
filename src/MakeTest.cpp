@@ -12,8 +12,6 @@ using namespace std;
 int MakeTest::checkForChange()
 {
     std::string newHash = getLastHash(dir);
-    cout << "The old hash is: " << lastHash << endl;
-    cout << "The new hash is: " << newHash <<endl;
 
     int returnValue = newHash.compare(lastHash);
     if( returnValue != 0) {
@@ -25,8 +23,6 @@ int MakeTest::checkForChange()
 
 int MakeTest::performTest(Result &test)
 {
-    cout << "Lets run a make test for " << testName << endl;
-
     int value;
     // Check if processor is available
     if (!system(NULL)) {
@@ -40,7 +36,7 @@ int MakeTest::performTest(Result &test)
     } else {
         cmd = std::string("cd ") + dir + " && " + MAKE + " 1> " + TEMP + " 2> " + TEMP;
     }
-    cout << "Running: " << cmd << endl;
+
     value = system((char*)cmd.c_str());
 
     //Load the text from the tempory file

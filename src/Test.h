@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include "Result.h"
+#include "gitTools.h"
 using namespace std;
 
 // Numbers are fixed so we can be sure the values don't change between versions
@@ -18,10 +19,15 @@ class Test
         int returnCode;
         string returnString;
         TestMode mode = UNTESTED;
+        std::string dir;
+        std::string lastHash = "";
+        std::string url; 
     public:
-        Test(string testName)
+        Test(string testName, string dir, string url)
         {
             this->testName = testName;
+            this->dir = dir;
+            this->url = url;
         }
         ~Test()
         {
@@ -29,11 +35,15 @@ class Test
             returnString.clear();
         }
 
-
+        //Methods which should be implemented in the subclasses
         int performTest(Result&);
+        void saveTest(FILE *fp);
+
+
         // 0    No changes
         //!0    Some changes have been applied
         int checkForChange();
+        void createNewRepo();
 
         string getTestName()
         {
@@ -63,5 +73,10 @@ class Test
         void unpause()
         {
             mode = UNTESTED;
+        }
+
+        void setLastHash(std::string nHash)
+        {
+            lastHash = nHash;
         }
 };

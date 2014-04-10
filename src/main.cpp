@@ -1,4 +1,4 @@
-using namespace std;
+
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -8,16 +8,16 @@ using namespace std;
 #include <sys/types.h> // 
 #include <pwd.h>       //
 
-#include <time.h> //for the time
-
-#include "MakeTest.h"
-#include "gitTools.h"
-#include "dir.h"
-
+#include <time.h>      //for the time
 
 //delay between checks in seconds
 #define DELAY 60
 
+using namespace std;
+
+#include "MakeTest.h"
+#include "gitTools.h"
+#include "dir.h"
 
 const char *homedir;
 
@@ -75,6 +75,7 @@ void updateTasksFromFile()
         }
         if(newTask) {
             tests.push_back(t);
+            t.createNewRepo(); //TODO This may not need to be run if the files are already there from before
         }
     }
 }
@@ -126,7 +127,6 @@ int start()
                 }
             }
         }
-        cout << endl;
         sleep(DELAY);
     }
     return 0;
@@ -134,9 +134,24 @@ int start()
 
 void printHelp()    
 {
-    cout << "Did you mean one of these?" << endl << endl
-            << "tiny-ci start             Starts the server program" << endl
-            << "tiny-ci add name gitURL   Adds a test to run" << endl << endl;
+    cout    << "Did you mean one of these?"                                         << endl << endl
+
+            << "tiny-ci start             Starts the server program"                << endl
+            << "tiny-ci list              Lists all the current tasks"              << endl
+            << "tiny-ci add name gitURL   Adds a test to run"                       << endl << endl;
+}
+
+void printAddHelp()
+{
+    cout 
+        << "tiny-ci add can be used to add tasks to be run by the tiny-ci program." << endl << endl
+
+        << "The required arguments are:"                                            << endl
+        << "   <name>:      The name of the new task"                               << endl
+        << "   <gitURL>:    The url for the git repository"                         << endl << endl
+
+        << "The command should then be in the form:"                                << endl
+        << "   tiny-ci add <name> <gitURL>"                                         << endl;
 }
 
 int main(int argc, char *argv[])
@@ -152,7 +167,11 @@ int main(int argc, char *argv[])
     if(!std::string(argv[1]).compare("start")) {
         start();
     } else if(!std::string(argv[1]).compare("add")) {
-        if(argc < 4) {
+        
+        if(argc >= 3 && !std::string(argv[2]).compare("help")) {
+            printAddHelp();
+            return 0;
+        } else if(argc < 4) {
             cout << "Not enough arguments to make a new task" << endl;
             printHelp();
             return 1;
@@ -167,9 +186,9 @@ int main(int argc, char *argv[])
         cout << "Directory: " << gitRootDir + "/" + argv[2] << endl;
         cout << "Git URL:   " << argv[3] << endl;
         cout << "Run test:  " << runTest << endl << endl;
-
         
         MakeTest t(argv[2], gitRootDir + "/" + argv[2], argv[3], runTest);
+        t.createNewRepo();
         addTaskToStore(t);
     } else if(!std::string(argv[1]).compare("list")) {
         listTasks();
@@ -181,3 +200,4 @@ int main(int argc, char *argv[])
 
     return 0;
 }
+

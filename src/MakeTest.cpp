@@ -9,18 +9,6 @@ using namespace std;
 #define MAKE_CHECK "make check"
 #define MAKE "make"
 
-int MakeTest::checkForChange()
-{
-    std::string newHash = getLastHash(dir);
-
-    int returnValue = newHash.compare(lastHash);
-    if( returnValue != 0) {
-        lastHash = newHash;
-    }
-
-    return returnValue;
-}
-
 int MakeTest::performTest(Result &test)
 {
     int value;

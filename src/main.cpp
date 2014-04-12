@@ -11,6 +11,8 @@
 #include <time.h>      //for the time
 #include <boost/regex.hpp>
 
+#include <sqlite3.h>
+
 //delay between checks in seconds
 #define DELAY 60
 
@@ -29,6 +31,8 @@ const char *homedir;
 std::string gitRootDir = "";
 
 std::vector<MakeTest> tests;
+
+sqlite3 *db;
 
 void initHomeDir()
 {
@@ -159,9 +163,24 @@ void printAddHelp()
         << "   tiny-ci add <name> <gitURL>"                                         << endl;
 }
 
+int openDatabase()
+{
+    int rc = sqlite3_open("test.db", &db);
+
+    if( rc ){
+        fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
+    }else{
+        fprintf(stderr, "Opened database successfully\n");
+    }
+    return !rc;
+}
+
 int main(int argc, char *argv[])
 {
     initHomeDir();
+    if(!openDatabase()) {
+        return 13;
+    }
 
     if(argc <= 1) {
         cout << "Not enough arguments!" << endl;

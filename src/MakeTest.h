@@ -1,5 +1,7 @@
+
 #include <fstream>
 #include "Test.h"
+
 using namespace std;
 
 class MakeTest: public Test
@@ -19,4 +21,10 @@ class MakeTest: public Test
         int performTest(Result&);
         void saveTest(FILE *fp);
         static MakeTest parseSaveString(string);
+
+        bool getDoTest()
+        {
+            return doTest;
+        }
 };
+

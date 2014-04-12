@@ -1,3 +1,4 @@
+
 #include <sqlite3.h>
 
 #include "MakeTest.h"
@@ -22,6 +23,9 @@ class test_database
         int addTask(MakeTest test);
         void listTasks();
         int getTasks(std::vector<MakeTest> *tests);
+        int addTestRun(int taskID, string commitHash, int returnValue);
+        //the paramiter taskID should be an int but in the form of a string
+        void listTestRuns(string taskID);
 
         int isOpen()
         {
@@ -29,3 +33,4 @@ class test_database
         }  
 
 };
+

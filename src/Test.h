@@ -1,8 +1,10 @@
 #include <iostream>
 #include <string>
+
+using namespace std;
+
 #include "Result.h"
 #include "gitTools.h"
-using namespace std;
 
 // Numbers are fixed so we can be sure the values don't change between versions
 enum TestMode {
@@ -30,6 +32,7 @@ class Test
             this->testName = testName;
             this->dir = dir;
             this->url = url;
+            //pullNewGit(url, dir);
         }
         ~Test()
         {
@@ -80,6 +83,10 @@ class Test
         void setLastHash(std::string nHash)
         {
             lastHash = nHash;
+        }
+        string getStoredLastHash()
+        {
+            return lastHash;
         }
         string getDir()
         {

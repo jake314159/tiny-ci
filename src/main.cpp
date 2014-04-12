@@ -24,6 +24,9 @@ using namespace std;
 #include "dir.h"
 #include "database.h"
 
+//#include "MakeTest.h"
+
+
 const char *homedir;
 
 std::string gitRootDir = "";
@@ -66,7 +69,7 @@ void addTaskToStore(MakeTest &t)
 
 void updateTasksFromFile()
 {
-    std::string taskFile = (std::string(gitRootDir) + "/.tasks");
+    /*std::string taskFile = (std::string(gitRootDir) + "/.tasks");
     std::ifstream input( taskFile );
     for( std::string line; getline( input, line ); )
     {
@@ -84,7 +87,9 @@ void updateTasksFromFile()
             tests.push_back(t);
             t.createNewRepo(); //TODO This may not need to be run if the files are already there from before
         }
-    }
+    }*/
+    tests.clear();
+    db.getTasks(&tests);
 }
 
 void listTasks()
@@ -132,6 +137,7 @@ int start()
                     //Success
                     cout << "[ PASS ] " << tests.at(i).getTestName() << " passed on " << ctime (&rawtime); //ctime ends with a '\n' 
                 }
+                db.addTestRun(tests.at(i).getID(), tests.at(i).getStoredLastHash(), r.getReturnValue());
             }
         }
         sleep(DELAY);
@@ -208,12 +214,19 @@ int main(int argc, char *argv[])
         
         MakeTest t(-1, argv[2], gitRootDir + "/" + argv[2], argv[3], runTest);
         db.addTask(t);
-        //t.createNewRepo();
+        t.createNewRepo();
         //addTaskToStore(t);
     } else if(!std::string(argv[1]).compare("list")) {
-        db.getTasks(&tests);
-        listTasks();
+        //db.getTasks(&tests);
+        //listTasks();
         //db.listTasks(); //TODO this is the only line which should be here
+        if(argc >= 3 && !boost::regex_match(argv[2], badInput)) {
+            db.listTestRuns(argv[2]);
+        } else {
+            //db.listTasks();
+            db.getTasks(&tests);
+            listTasks();
+        }
     } else {
         cout << "Incorrect argument!" << endl;
         printHelp();

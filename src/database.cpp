@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <cstring>
+#include <time.h>
 
 using namespace std;
 
@@ -68,8 +69,15 @@ int test_database::addTask(MakeTest test)
 {
     char *zErrMsg = NULL;
 
+    string mode;
+    
+    if(test.getDoTest()) {
+        mode = "M";
+    } else {
+        mode = "m";
+    }
     string sql = "INSERT INTO TASKS (TYPE,NAME,GIT_URL,DIR) "  \
-         "VALUES ('M', '"+test.getTestName()+"', '"+test.getURL()+"', '"+test.getDir()+"' ); ";
+             "VALUES ('"+mode+"', '"+test.getTestName()+"', '"+test.getURL()+"', '"+test.getDir()+"' ); ";
 
     int rc = sqlite3_exec(db, (char*)sql.c_str(), initTableCallback, 0, &zErrMsg);
     if( rc != SQLITE_OK ){
@@ -108,14 +116,14 @@ void test_database::listTasks()
 
 
 static int getTasksCallback(void *testVector, int argc, char **argv, char **azColName){
-   std::vector<MakeTest> *tests = (std::vector<MakeTest>*) testVector;
-   int i;
+    std::vector<MakeTest> *tests = (std::vector<MakeTest>*) testVector;
+    int i;
     int id;
     string name;
     string dir;
     string url;
     bool runTest;
-   for(i=0; i<argc; i++){
+    for(i=0; i<argc; i++){
         if(!strcmp(azColName[i], "ID")) {
            id = atoi(argv[i]);
         } else if(!strcmp(azColName[i], "NAME")) {
@@ -159,5 +167,46 @@ int test_database::getTasks(std::vector<MakeTest> *tests)
         fprintf(stdout, "Task added to vector successfully\n");
     }
     return rc;
+}
+
+int test_database::addTestRun(int taskID, string commitHash, int returnValue)
+{
+/*std::string sqlRunTable = "CREATE TABLE IF NOT EXISTS TEST_RUNS("  \
+         "ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," \
+         "TASK           INTEGER      NOT NULL," \
+         "COMMIT_HASH    CHAR(40)     NOT NULL," \
+         "VALUE          INTEGER      NOT NULL," \
+         "TIME           LONG         NOT NULL," \
+         "FOREIGN KEY (TASK) REFERENCES TASKS(ID));";*/
+
+    char *zErrMsg = NULL;
+    long int t = static_cast<long int> (time(NULL));
+    string sql = "INSERT INTO TEST_RUNS (TASK, COMMIT_HASH, VALUE, TIME) "  \
+             "VALUES ('"+std::to_string(taskID)+"', '"+commitHash+"', '"+std::to_string(returnValue)+"', '"+std::to_string(t)+"' ); ";
+
+    int rc = sqlite3_exec(db, (char*)sql.c_str(), initTableCallback, 0, &zErrMsg);
+    if( rc != SQLITE_OK ){
+        fprintf(stderr, "SQL error: %s\n", zErrMsg);
+        sqlite3_free(zErrMsg);
+    }//else{
+     //   fprintf(stdout, "Test run added successfully\n");
+    //}
+    return rc;
+}
+
+//the paramiter taskID should be an int but in the form of a string
+void test_database::listTestRuns(string taskID)
+{
+    char *zErrMsg = NULL;
+
+    string sql = "SELECT * from TEST_RUNS WHERE TASK='"+taskID+"'";
+
+    int rc = sqlite3_exec(db, (char*)sql.c_str(), listTasksCallback, 0, &zErrMsg);
+    if( rc != SQLITE_OK ){
+        fprintf(stderr, "SQL error: %s\n", zErrMsg);
+        sqlite3_free(zErrMsg);
+    }else{
+        fprintf(stdout, "Task added successfully\n");
+    }
 }
 

@@ -20,9 +20,9 @@ int MakeTest::performTest(Result &test)
     //run command
     std::string cmd;
     if(doTest) {
-        cmd = std::string("cd ") + dir + " && " + MAKE_CHECK + " 1> " + TEMP + " 2> " + TEMP;
+        cmd = std::string("cd ") + dir + " && " + GIT_PULL + " && " + MAKE_CHECK + " 1> " + TEMP + " 2> " + TEMP;
     } else {
-        cmd = std::string("cd ") + dir + " && " + MAKE + " 1> " + TEMP + " 2> " + TEMP;
+        cmd = std::string("cd ") + dir + " && " + GIT_PULL + " && " + MAKE + " 1> " + TEMP + " 2> " + TEMP;
     }
 
     value = system((char*)cmd.c_str());

@@ -14,12 +14,8 @@
 //delay between checks in seconds
 #define DELAY 60
 
-//boost::regex urlRegex("^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$");
-//git@github.com:jake314159/tiny-ci.git
-//boost::regex urlRegex("[a-zA-Z0-9@]://([a-zA-Z0-9]*\\.)+([a-zA-Z0-9]+)/?");
-
 //Regex to check for things which shouldn't be passed to a bash shell
-boost::regex badInput(".*(>|<|&&|\\|).*");
+boost::regex badInput(".*($|>|<|&&|\\|).*");
 
 using namespace std;
 

@@ -15,13 +15,16 @@
 #define DELAY 60
 
 //Regex to check for things which shouldn't be passed to a bash shell
-boost::regex badInput(".*($|>|<|&&|\\|).*");
+boost::regex badInput(".*(>|<|&&|\\|).*");
 
 using namespace std;
 
-#include "MakeTest.h"
+//#include "MakeTest.h"
 #include "gitTools.h"
 #include "dir.h"
+#include "database.h"
+
+//#include "MakeTest.h"
 
 
 const char *homedir;
@@ -29,6 +32,8 @@ const char *homedir;
 std::string gitRootDir = "";
 
 std::vector<MakeTest> tests;
+
+test_database db;
 
 void initHomeDir()
 {
@@ -64,7 +69,7 @@ void addTaskToStore(MakeTest &t)
 
 void updateTasksFromFile()
 {
-    std::string taskFile = (std::string(gitRootDir) + "/.tasks");
+    /*std::string taskFile = (std::string(gitRootDir) + "/.tasks");
     std::ifstream input( taskFile );
     for( std::string line; getline( input, line ); )
     {
@@ -82,6 +87,13 @@ void updateTasksFromFile()
             tests.push_back(t);
             t.createNewRepo(); //TODO This may not need to be run if the files are already there from before
         }
+    }*/
+    tests.clear();
+    db.getTasks(&tests);
+    int size = tests.size();
+    for(int i=0; i<size; i++) {
+        string lastHash = db.getTestRunsHash(std::to_string(tests.at(i).getID()));
+        tests.at(i).setLastHash( lastHash );
     }
 }
 
@@ -103,7 +115,7 @@ void listTasks()
         } else {
             cout << "[ ERR  ]";
         }
-        cout << "  " << test.getTestName() << endl;
+        cout << "  " << test.getID() << ") " << test.getTestName() << endl;
     }
 }
 
@@ -130,6 +142,7 @@ int start()
                     //Success
                     cout << "[ PASS ] " << tests.at(i).getTestName() << " passed on " << ctime (&rawtime); //ctime ends with a '\n' 
                 }
+                db.addTestRun(tests.at(i).getID(), tests.at(i).getStoredLastHash(), r.getReturnValue());
             }
         }
         sleep(DELAY);
@@ -162,6 +175,11 @@ void printAddHelp()
 int main(int argc, char *argv[])
 {
     initHomeDir();
+    db.openConnection();
+    db.initTable();
+    if(!db.isOpen()) {
+        return 13;
+    }
 
     if(argc <= 1) {
         cout << "Not enough arguments!" << endl;
@@ -183,7 +201,7 @@ int main(int argc, char *argv[])
         }
 
         if(boost::regex_match(argv[2], badInput)) {
-            cout << "Badly formed test name. Unable to continue" << endl;
+            cout << "Badly formed test name " << argv[2] << ". Unable to continue" << endl;
             return 10;
         } else if(boost::regex_match(argv[3], badInput)) {
             cout << "Badly formed git url. Unable to continue" << endl;
@@ -201,11 +219,22 @@ int main(int argc, char *argv[])
         cout << "Run test:  " << runTest << endl << endl;
         cout << "Git url check: " << boost::regex_match(argv[3], badInput) << endl;
         
-        MakeTest t(argv[2], gitRootDir + "/" + argv[2], argv[3], runTest);
+        MakeTest t(-1, argv[2], gitRootDir + "/" + argv[2], argv[3], runTest);
+        db.addTask(t);
         t.createNewRepo();
-        addTaskToStore(t);
+        //addTaskToStore(t);
     } else if(!std::string(argv[1]).compare("list")) {
-        listTasks();
+        //db.getTasks(&tests);
+        //listTasks();
+        //db.listTasks(); //TODO this is the only line which should be here
+        if(argc >= 3 && !boost::regex_match(argv[2], badInput)) {
+            db.listTestRuns(argv[2]);
+            //cout << "The last hash was: "<< db.getTestRunsHash(argv[2]) << endl;
+        } else {
+            //db.listTasks();
+            db.getTasks(&tests);
+            listTasks();
+        }
     } else {
         cout << "Incorrect argument!" << endl;
         printHelp();

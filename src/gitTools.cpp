@@ -8,7 +8,7 @@ using namespace std;
 
 std::string getLastHash(std::string dir)
 {
-    std::string cmd = std::string("cd ") + dir + " && " + GIT_LAST_HASH;
+    std::string cmd = std::string("cd ") + dir + " && " + GIT_PULL +" && " + GIT_LAST_HASH;
     //cout << "cmd " << cmd << endl;
     FILE* pipe = popen((char*)cmd.c_str(), "r");
     if (!pipe) return "ERROR";

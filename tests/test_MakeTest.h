@@ -23,7 +23,7 @@
 #include "minunit.h"
 
 static char* test_BASIC_CONSTRUCTOR() {
-    MakeTest t("testName", "./testTemp/testDir", "testURL");
+    MakeTest t(-1, "testName", "./testTemp/testDir", "testURL");
     static char errMsg1[] = "Basic constructor name not being set correctly";
     mu_assert(errMsg1, !t.getTestName().compare("testName"));
     return 0;
@@ -37,7 +37,7 @@ static char* test_PARSE_SAVE_STRING() {
 }
 
 static char* test_PAUSE() {
-    MakeTest t("testName", "./testTemp/testDir", "testURL");
+    MakeTest t(-1, "testName", "./testTemp/testDir", "testURL");
     t.pause();
     static char errMsg1[] = "Test can't be paused";
     mu_assert(errMsg1, t.getMode() == PAUSED);
@@ -45,7 +45,7 @@ static char* test_PAUSE() {
 }
 
 static char* test_UNPAUSE() {
-    MakeTest t("testName", "./testTemp/testDir", "testURL");
+    MakeTest t(-1, "testName", "./testTemp/testDir", "testURL");
     t.pause();
     static char errMsg1[] = "Test can't be paused";
     mu_assert(errMsg1, t.getMode() == PAUSED);

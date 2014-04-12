@@ -79,4 +79,12 @@ class Test
         {
             lastHash = nHash;
         }
+        string getDir()
+        {
+            return dir;
+        }
+        string getURL()
+        {
+            return url;
+        }
 };

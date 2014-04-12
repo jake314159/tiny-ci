@@ -11,20 +11,18 @@
 #include <time.h>      //for the time
 #include <boost/regex.hpp>
 
-#include <sqlite3.h>
-
 //delay between checks in seconds
 #define DELAY 60
 
 //Regex to check for things which shouldn't be passed to a bash shell
-boost::regex badInput(".*($|>|<|&&|\\|).*");
+boost::regex badInput(".*(>|<|&&|\\|).*");
 
 using namespace std;
 
-#include "MakeTest.h"
+//#include "MakeTest.h"
 #include "gitTools.h"
 #include "dir.h"
-
+#include "database.h"
 
 const char *homedir;
 
@@ -32,7 +30,7 @@ std::string gitRootDir = "";
 
 std::vector<MakeTest> tests;
 
-sqlite3 *db;
+test_database db;
 
 void initHomeDir()
 {
@@ -163,22 +161,10 @@ void printAddHelp()
         << "   tiny-ci add <name> <gitURL>"                                         << endl;
 }
 
-int openDatabase()
-{
-    int rc = sqlite3_open("test.db", &db);
-
-    if( rc ){
-        fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
-    }else{
-        fprintf(stderr, "Opened database successfully\n");
-    }
-    return !rc;
-}
-
 int main(int argc, char *argv[])
 {
     initHomeDir();
-    if(!openDatabase()) {
+    if(!db.isOpen()) {
         return 13;
     }
 
@@ -202,7 +188,7 @@ int main(int argc, char *argv[])
         }
 
         if(boost::regex_match(argv[2], badInput)) {
-            cout << "Badly formed test name. Unable to continue" << endl;
+            cout << "Badly formed test name " << argv[2] << ". Unable to continue" << endl;
             return 10;
         } else if(boost::regex_match(argv[3], badInput)) {
             cout << "Badly formed git url. Unable to continue" << endl;
@@ -221,10 +207,13 @@ int main(int argc, char *argv[])
         cout << "Git url check: " << boost::regex_match(argv[3], badInput) << endl;
         
         MakeTest t(argv[2], gitRootDir + "/" + argv[2], argv[3], runTest);
-        t.createNewRepo();
-        addTaskToStore(t);
+        db.addTask(t);
+        //t.createNewRepo();
+        //addTaskToStore(t);
     } else if(!std::string(argv[1]).compare("list")) {
+        db.getTasks(&tests);
         listTasks();
+        //db.listTasks(); //TODO this is the only line which should be here
     } else {
         cout << "Incorrect argument!" << endl;
         printHelp();

@@ -16,8 +16,8 @@ BOOST_LIB_DIR=/usr/local/lib
 all: $(BIN)/tiny-ci size
 check: tester
 
-$(BIN)/tiny-ci: $(BIN)/main.o $(BIN)/Test.o $(BIN)/MakeTest.o $(BIN)/Result.o $(BIN)/gitTools.o
-	$(CC) -I $(BOOST_INCLUDE_DIR) -L $(BOOST_LIB_DIR) -Wl,-rpath,$(BOOST_LIB_DIR) $(CCFLAGS) $(BIN)/main.o $(BIN)/Test.o $(BIN)/MakeTest.o $(BIN)/Result.o $(BIN)/gitTools.o -lboost_regex -lsqlite3 -o $(BIN)/$(FILE_OUT)
+$(BIN)/tiny-ci: $(BIN)/main.o $(BIN)/Test.o $(BIN)/MakeTest.o $(BIN)/Result.o $(BIN)/gitTools.o $(BIN)/database.o
+	$(CC) -I $(BOOST_INCLUDE_DIR) -L $(BOOST_LIB_DIR) -Wl,-rpath,$(BOOST_LIB_DIR) $(CCFLAGS) $(BIN)/main.o $(BIN)/Test.o $(BIN)/MakeTest.o $(BIN)/Result.o $(BIN)/gitTools.o $(BIN)/database.o -lboost_regex -lsqlite3 -o $(BIN)/$(FILE_OUT)
 
 $(BIN)/main.o: $(SRC)/main.cpp $(BIN)
 	$(CC) $(CCFLAGS) -c $(SRC)/main.cpp -o $(BIN)/main.o
@@ -33,6 +33,9 @@ $(BIN)/Result.o: $(SRC)/Result.cpp $(BIN)
 
 $(BIN)/gitTools.o: $(SRC)/gitTools.cpp $(BIN)
 	$(CC) $(CCFLAGS) -c $(SRC)/gitTools.cpp -o $(BIN)/gitTools.o
+
+$(BIN)/database.o: $(SRC)/database.cpp $(BIN)
+	$(CC) $(CCFLAGS) -c $(SRC)/database.cpp -o $(BIN)/database.o
 
 $(BIN): 
 	mkdir -p $(BIN)

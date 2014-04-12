@@ -90,6 +90,11 @@ void updateTasksFromFile()
     }*/
     tests.clear();
     db.getTasks(&tests);
+    int size = tests.size();
+    for(int i=0; i<size; i++) {
+        string lastHash = db.getTestRunsHash(std::to_string(tests.at(i).getID()));
+        tests.at(i).setLastHash( lastHash );
+    }
 }
 
 void listTasks()

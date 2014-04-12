@@ -110,13 +110,14 @@ void test_database::listTasks()
 static int getTasksCallback(void *testVector, int argc, char **argv, char **azColName){
    std::vector<MakeTest> *tests = (std::vector<MakeTest>*) testVector;
    int i;
+    int id;
     string name;
     string dir;
     string url;
     bool runTest;
    for(i=0; i<argc; i++){
         if(!strcmp(azColName[i], "ID")) {
-            cout << "THIS IS AN ID";
+           id = atoi(argv[i]);
         } else if(!strcmp(azColName[i], "NAME")) {
             name = argv[i];
         } else if(!strcmp(azColName[i], "GIT_URL")) {
@@ -137,7 +138,7 @@ static int getTasksCallback(void *testVector, int argc, char **argv, char **azCo
         }
         //printf("%s\t", argv[i] ? argv[i] : "NULL");
     }
-    MakeTest t(name, dir, url, runTest);
+    MakeTest t(id, name, dir, url, runTest);
     t.createNewRepo();
     tests->push_back(t);
     printf("\n");

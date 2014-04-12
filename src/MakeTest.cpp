@@ -72,7 +72,7 @@ MakeTest MakeTest::parseSaveString(string inString)
     bool doTest = true;
     if(!parts[3].compare("0")) doTest = false;
 
-    MakeTest t0(parts[0], parts[1], parts[2], doTest);
+    MakeTest t0(-1, parts[0], parts[1], parts[2], doTest);
     return t0;
 }
 

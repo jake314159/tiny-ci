@@ -7,11 +7,11 @@ class MakeTest: public Test
     private:
         bool doTest = false;
     public:
-        MakeTest(string testName, string dir, string url): Test(testName, dir, url)
+        MakeTest(int id, string testName, string dir, string url): Test(id, testName, dir, url)
         {
             
         }
-        MakeTest(string testName, string dir, string url, bool doTestSet): Test(testName, dir, url)
+        MakeTest(int id, string testName, string dir, string url, bool doTestSet): Test(id, testName, dir, url)
         {
             doTest = doTestSet;
         }

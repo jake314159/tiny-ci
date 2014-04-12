@@ -15,6 +15,7 @@ enum TestMode {
 class Test
 {
     protected:
+        int id;
         string testName;
         int returnCode;
         string returnString;
@@ -23,8 +24,9 @@ class Test
         std::string lastHash = "";
         std::string url; 
     public:
-        Test(string testName, string dir, string url)
+        Test(int id, string testName, string dir, string url)
         {
+            this->id = id;
             this->testName = testName;
             this->dir = dir;
             this->url = url;
@@ -86,5 +88,9 @@ class Test
         string getURL()
         {
             return url;
+        }
+        int getID()
+        {
+            return id;
         }
 };

@@ -105,7 +105,7 @@ void listTasks()
         } else {
             cout << "[ ERR  ]";
         }
-        cout << "  " << test.getTestName() << endl;
+        cout << "  " << test.getID() << ") " << test.getTestName() << endl;
     }
 }
 
@@ -206,7 +206,7 @@ int main(int argc, char *argv[])
         cout << "Run test:  " << runTest << endl << endl;
         cout << "Git url check: " << boost::regex_match(argv[3], badInput) << endl;
         
-        MakeTest t(argv[2], gitRootDir + "/" + argv[2], argv[3], runTest);
+        MakeTest t(-1, argv[2], gitRootDir + "/" + argv[2], argv[3], runTest);
         db.addTask(t);
         //t.createNewRepo();
         //addTaskToStore(t);

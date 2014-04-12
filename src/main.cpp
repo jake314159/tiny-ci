@@ -175,6 +175,8 @@ void printAddHelp()
 int main(int argc, char *argv[])
 {
     initHomeDir();
+    db.openConnection();
+    db.initTable();
     if(!db.isOpen()) {
         return 13;
     }

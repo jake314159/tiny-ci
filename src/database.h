@@ -6,20 +6,21 @@
 class test_database
 {
     private:
-        void openConnection();
-        void initTable();
+        
         sqlite3 *db;
         int connectionStatus = false;
     public:
         test_database()
         {
-            openConnection();
-            initTable();
+            //openConnection();
+            //initTable();
         }
         ~test_database()
         {
             sqlite3_close(db);
         }
+        void openConnection();
+        void initTable();
         int addTask(MakeTest test);
         void listTasks();
         int getTasks(std::vector<MakeTest> *tests);

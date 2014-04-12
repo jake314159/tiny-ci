@@ -9,9 +9,12 @@ using namespace std;
 
 #define DATABASE_FILE "taskDB.db"
 
+extern const char *homedir;
+
 void test_database::openConnection()
 {
-    connectionStatus = !sqlite3_open(DATABASE_FILE, &db);
+    cout << "Database file: " << std::string(homedir) +"/"+ DATABASE_FILE << endl;
+    connectionStatus = !sqlite3_open( (char*)(std::string(homedir) +"/"+ DATABASE_FILE).c_str(), &db);
 
     if( !connectionStatus ){
         fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));

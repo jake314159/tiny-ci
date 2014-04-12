@@ -227,7 +227,7 @@ int main(int argc, char *argv[])
         //db.listTasks(); //TODO this is the only line which should be here
         if(argc >= 3 && !boost::regex_match(argv[2], badInput)) {
             db.listTestRuns(argv[2]);
-            cout << "The last hash was: "<< db.getTestRunsHash(argv[2]) << endl;
+            //cout << "The last hash was: "<< db.getTestRunsHash(argv[2]) << endl;
         } else {
             //db.listTasks();
             db.getTasks(&tests);

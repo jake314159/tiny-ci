@@ -13,20 +13,9 @@ void test_database::openConnection()
 {
     connectionStatus = !sqlite3_open(DATABASE_FILE, &db);
 
-    if( connectionStatus ){
-        fprintf(stderr, "Opened database successfully\n");
-    }else{
+    if( !connectionStatus ){
         fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
     }
-}
-
-static int initTableCallback(void *NotUsed, int argc, char **argv, char **azColName){
-   int i;
-   for(i=0; i<argc; i++){
-      printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
-   }
-   printf("\n");
-   return 0;
 }
 
 void test_database::initTable()
@@ -48,20 +37,16 @@ void test_database::initTable()
          "FOREIGN KEY (TASK) REFERENCES TASKS(ID));";
 
     /* Execute SQL statement */
-    int rc = sqlite3_exec(db, (char*)sqlTaskTable.c_str(), initTableCallback, 0, &zErrMsg);
+    int rc = sqlite3_exec(db, (char*)sqlTaskTable.c_str(), NULL, 0, &zErrMsg);
     if( rc != SQLITE_OK ){
         fprintf(stderr, "SQL error: %s\n", zErrMsg);
         sqlite3_free(zErrMsg);
-    }else{
-        fprintf(stdout, "Task table created successfully\n");
     }
 
-    rc = sqlite3_exec(db, (char*)sqlRunTable.c_str(), initTableCallback, 0, &zErrMsg);
+    rc = sqlite3_exec(db, (char*)sqlRunTable.c_str(), NULL, 0, &zErrMsg);
     if( rc != SQLITE_OK ){
         fprintf(stderr, "SQL error: %s\n", zErrMsg);
         sqlite3_free(zErrMsg);
-    }else{
-        fprintf(stdout, "Test run table created successfully\n");
     }
 }
 
@@ -79,7 +64,7 @@ int test_database::addTask(MakeTest test)
     string sql = "INSERT INTO TASKS (TYPE,NAME,GIT_URL,DIR) "  \
              "VALUES ('"+mode+"', '"+test.getTestName()+"', '"+test.getURL()+"', '"+test.getDir()+"' ); ";
 
-    int rc = sqlite3_exec(db, (char*)sql.c_str(), initTableCallback, 0, &zErrMsg);
+    int rc = sqlite3_exec(db, (char*)sql.c_str(), NULL, 0, &zErrMsg);
     if( rc != SQLITE_OK ){
         fprintf(stderr, "SQL error: %s\n", zErrMsg);
         sqlite3_free(zErrMsg);
@@ -109,8 +94,6 @@ void test_database::listTasks()
     if( rc != SQLITE_OK ){
         fprintf(stderr, "SQL error: %s\n", zErrMsg);
         sqlite3_free(zErrMsg);
-    }else{
-        fprintf(stdout, "Task added successfully\n");
     }
 }
 
@@ -149,7 +132,7 @@ static int getTasksCallback(void *testVector, int argc, char **argv, char **azCo
     MakeTest t(id, name, dir, url, runTest);
     t.createNewRepo();
     tests->push_back(t);
-    printf("\n");
+    //printf("\n");
     return 0;
 }
 
@@ -163,8 +146,6 @@ int test_database::getTasks(std::vector<MakeTest> *tests)
     if( rc != SQLITE_OK ){
         fprintf(stderr, "SQL error: %s\n", zErrMsg);
         sqlite3_free(zErrMsg);
-    }else{
-        fprintf(stdout, "Task added to vector successfully\n");
     }
     return rc;
 }
@@ -197,13 +178,11 @@ int test_database::addTestRun(int taskID, string commitHash, int returnValue)
     string sql = "INSERT INTO TEST_RUNS (TASK, COMMIT_HASH, VALUE, TIME) "  \
              "VALUES ('"+std::to_string(taskID)+"', '"+commitHash+"', '"+std::to_string(returnValue)+"', '"+std::to_string(t)+"' ); ";
 
-    int rc = sqlite3_exec(db, (char*)sql.c_str(), initTableCallback, 0, &zErrMsg);
+    int rc = sqlite3_exec(db, (char*)sql.c_str(), NULL, 0, &zErrMsg);
     if( rc != SQLITE_OK ){
         fprintf(stderr, "SQL error: %s\n", zErrMsg);
         sqlite3_free(zErrMsg);
-    }//else{
-     //   fprintf(stdout, "Test run added successfully\n");
-    //}
+    }
     return rc;
 }
 
@@ -212,14 +191,14 @@ void test_database::listTestRuns(string taskID)
 {
     char *zErrMsg = NULL;
 
+    cout <<   "ID \tTask\tCommit hash                             \tVal\tTime" << endl;
+//             3	3	defcbeafa43e4cb9368147dd675a8507f5b9c56f	0	1397321152
     string sql = "SELECT * from TEST_RUNS WHERE TASK='"+taskID+"'";
 
     int rc = sqlite3_exec(db, (char*)sql.c_str(), listTasksCallback, 0, &zErrMsg);
     if( rc != SQLITE_OK ){
         fprintf(stderr, "SQL error: %s\n", zErrMsg);
         sqlite3_free(zErrMsg);
-    }else{
-        fprintf(stdout, "Task added successfully\n");
     }
 }
 

@@ -9,15 +9,24 @@
 #include <pwd.h>       //
 
 #include <time.h>      //for the time
+#include <boost/regex.hpp>
 
 //delay between checks in seconds
 #define DELAY 60
+
+//boost::regex urlRegex("^((http[s]?|ftp):\\/)?\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$");
+//git@github.com:jake314159/tiny-ci.git
+//boost::regex urlRegex("[a-zA-Z0-9@]://([a-zA-Z0-9]*\\.)+([a-zA-Z0-9]+)/?");
+
+//Regex to check for things which shouldn't be passed to a bash shell
+boost::regex badInput(".*(>|<|&&|\\|).*");
 
 using namespace std;
 
 #include "MakeTest.h"
 #include "gitTools.h"
 #include "dir.h"
+
 
 const char *homedir;
 
@@ -176,6 +185,14 @@ int main(int argc, char *argv[])
             printHelp();
             return 1;
         }
+
+        if(boost::regex_match(argv[2], badInput)) {
+            cout << "Badly formed test name. Unable to continue" << endl;
+            return 10;
+        } else if(boost::regex_match(argv[3], badInput)) {
+            cout << "Badly formed git url. Unable to continue" << endl;
+            return 10;
+        }
         
         bool runTest = false;
         if(argc > 4 && !std::string(argv[4]).compare("true")) {
@@ -186,6 +203,7 @@ int main(int argc, char *argv[])
         cout << "Directory: " << gitRootDir + "/" + argv[2] << endl;
         cout << "Git URL:   " << argv[3] << endl;
         cout << "Run test:  " << runTest << endl << endl;
+        cout << "Git url check: " << boost::regex_match(argv[3], badInput) << endl;
         
         MakeTest t(argv[2], gitRootDir + "/" + argv[2], argv[3], runTest);
         t.createNewRepo();

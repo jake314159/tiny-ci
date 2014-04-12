@@ -10,11 +10,14 @@ SRC = src
 CC = g++
 CCFLAGS = -Wall -std=c++11
 
+BOOST_INCLUDE_DIR=/usr/local/include/boost
+BOOST_LIB_DIR=/usr/local/lib
+
 all: $(BIN)/tiny-ci size
 check: tester
 
 $(BIN)/tiny-ci: $(BIN)/main.o $(BIN)/Test.o $(BIN)/MakeTest.o $(BIN)/Result.o $(BIN)/gitTools.o
-	$(CC) $(CCFLAGS) $(BIN)/main.o $(BIN)/Test.o $(BIN)/MakeTest.o $(BIN)/Result.o $(BIN)/gitTools.o -o $(BIN)/$(FILE_OUT)
+	$(CC) -I $(BOOST_INCLUDE_DIR) -L $(BOOST_LIB_DIR) -Wl,-rpath,$(BOOST_LIB_DIR) $(CCFLAGS) $(BIN)/main.o $(BIN)/Test.o $(BIN)/MakeTest.o $(BIN)/Result.o $(BIN)/gitTools.o -lboost_regex -o $(BIN)/$(FILE_OUT)
 
 $(BIN)/main.o: $(SRC)/main.cpp $(BIN)
 	$(CC) $(CCFLAGS) -c $(SRC)/main.cpp -o $(BIN)/main.o

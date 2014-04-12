@@ -26,6 +26,7 @@ class test_database
         int addTestRun(int taskID, string commitHash, int returnValue);
         //the paramiter taskID should be an int but in the form of a string
         void listTestRuns(string taskID);
+        string getTestRunsHash(string taskID);
 
         int isOpen()
         {

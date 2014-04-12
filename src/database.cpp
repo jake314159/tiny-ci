@@ -169,16 +169,29 @@ int test_database::getTasks(std::vector<MakeTest> *tests)
     return rc;
 }
 
+string newHash_for_callback;
+static int getLastHashCallback(void *stringTarget, int argc, char **argv, char **azColName){
+    newHash_for_callback = argv[0];
+    return 0;
+}
+string test_database::getTestRunsHash(string taskID)
+{
+    char *zErrMsg = NULL;
+    
+    newHash_for_callback = "";
+
+    string sql = "SELECT COMMIT_HASH from TEST_RUNS WHERE TASK='"+taskID+"' ORDER BY ID DESC LIMIT 1";
+
+    int rc = sqlite3_exec(db, (char*)sql.c_str(), getLastHashCallback, 0, &zErrMsg);
+    if( rc != SQLITE_OK ){
+        fprintf(stderr, "SQL error: %s\n", zErrMsg);
+        sqlite3_free(zErrMsg);
+    }
+    return newHash_for_callback;
+}
+
 int test_database::addTestRun(int taskID, string commitHash, int returnValue)
 {
-/*std::string sqlRunTable = "CREATE TABLE IF NOT EXISTS TEST_RUNS("  \
-         "ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," \
-         "TASK           INTEGER      NOT NULL," \
-         "COMMIT_HASH    CHAR(40)     NOT NULL," \
-         "VALUE          INTEGER      NOT NULL," \
-         "TIME           LONG         NOT NULL," \
-         "FOREIGN KEY (TASK) REFERENCES TASKS(ID));";*/
-
     char *zErrMsg = NULL;
     long int t = static_cast<long int> (time(NULL));
     string sql = "INSERT INTO TEST_RUNS (TASK, COMMIT_HASH, VALUE, TIME) "  \

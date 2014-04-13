@@ -6,6 +6,7 @@
 using namespace std;
 
 #include "database.h"
+#include "dir.h"
 
 #define DATABASE_FILE "taskDB.db"
 
@@ -13,8 +14,8 @@ extern const char *homedir;
 
 void test_database::openConnection()
 {
-    cout << "Database file: " << std::string(homedir) +"/"+ DATABASE_FILE << endl;
-    connectionStatus = !sqlite3_open( (char*)(std::string(homedir) +"/"+ DATABASE_FILE).c_str(), &db);
+    cout << "Database file: " << std::string(homedir) + "/" + HOME_DIR +"/"+ DATABASE_FILE << endl;
+    connectionStatus = !sqlite3_open( (char*)(std::string(homedir) + "/" + HOME_DIR +"/"+ DATABASE_FILE).c_str(), &db);
 
     if( !connectionStatus ){
         fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));

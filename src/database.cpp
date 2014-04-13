@@ -78,13 +78,34 @@ int test_database::addTask(MakeTest test)
 }
 
 static int listTasksCallback(void *NotUsed, int argc, char **argv, char **azColName){
-   int i;
-   for(i=0; i<argc; i++){
-      //printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
-      printf("%s\t", argv[i] ? argv[i] : "NULL");
-   }
-   printf("\n");
-   return 0;
+    int i;
+    bool printNewLine = true;
+    for(i=0; i<argc; i++){
+        //printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
+        if(!strcmp(azColName[i], "TIME")) {
+            long int time = atol(argv[i]);
+            printf("%s", ctime((time_t*)&time) );
+            printNewLine = false;
+        } else  if(!strcmp(azColName[i], "COMMIT_HASH")) {
+            // Only print the first few characters
+            for(int j=0; j<12; j++) {
+                printf("%c", argv[i][j]);
+            }
+            printf("\t");
+        } else if(!strcmp(azColName[i], "VALUE")) {
+            if(!strcmp(argv[i], "0")) {
+                printf("PASS\t");
+            } else {
+                printf("FAIL\t");
+            }
+        } else {
+            printf("%s\t", argv[i] ? argv[i] : "NULL");
+        }
+    }
+    if(printNewLine) {
+        printf("\n");
+    }
+    return 0;
 }
 
 void test_database::listTasks()
@@ -194,7 +215,7 @@ void test_database::listTestRuns(string taskID)
 {
     char *zErrMsg = NULL;
 
-    cout <<   "ID \tTask\tCommit hash                             \tVal\tTime" << endl;
+    cout <<   "ID \tTask\tCommit hash\tResult\tTime" << endl;
 //             3	3	defcbeafa43e4cb9368147dd675a8507f5b9c56f	0	1397321152
     string sql = "SELECT * from TEST_RUNS WHERE TASK='"+taskID+"'";
 

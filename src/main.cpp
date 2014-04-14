@@ -31,7 +31,7 @@ const char *homedir;
 
 std::string gitRootDir = "";
 
-std::vector<MakeTest> tests;
+std::vector<Test*> tests;
 
 test_database db;
 
@@ -69,31 +69,16 @@ void addTaskToStore(MakeTest &t)
 
 void updateTasksFromFile()
 {
-    /*std::string taskFile = (std::string(gitRootDir) + "/.tasks");
-    std::ifstream input( taskFile );
-    for( std::string line; getline( input, line ); )
-    {
-        MakeTest t = MakeTest::parseSaveString(line);
-        bool newTask = true;
-        int size = tests.size();
-        for(int i=0; i<size; i++) {
-            //cout << "Comparing " << tests.at(i).getTestName() << " and " << t.getTestName() << endl;
-            if(!tests.at(i).getTestName().compare(t.getTestName())) {
-                newTask = false;
-                //cout << "They are the same!" << endl;
-            }
-        }
-        if(newTask) {
-            tests.push_back(t);
-            t.createNewRepo(); //TODO This may not need to be run if the files are already there from before
-        }
-    }*/
-    tests.clear();
-    db.getTasks(&tests);
     int size = tests.size();
     for(int i=0; i<size; i++) {
-        string lastHash = db.getTestRunsHash(std::to_string(tests.at(i).getID()));
-        tests.at(i).setLastHash( lastHash );
+        delete tests.at(i);
+    }
+    tests.clear();
+    db.getTasks(&tests);
+    
+    for(int i=0; i<size; i++) {
+        string lastHash = db.getTestRunsHash(std::to_string(tests.at(i)->getID()));
+        tests.at(i)->setLastHash( lastHash );
     }
 }
 
@@ -102,8 +87,8 @@ void listTasks()
     updateTasksFromFile();
     int size = tests.size();
     for(int i=0; i<size; i++) {
-        MakeTest test = tests.at(i);
-        TestMode mode = test.getMode();
+        Test *test = tests.at(i);
+        TestMode mode = test->getMode();
         if(mode == PASS) {
             cout << "[ PASS ]";
         } else if(mode == FAIL) {
@@ -115,7 +100,7 @@ void listTasks()
         } else {
             cout << "[ ERR  ]";
         }
-        cout << "  " << test.getID() << ") " << test.getTestName() << endl;
+        cout << "  " << test->getID() << ") " << test->getTestName() << endl;
     }
 }
 
@@ -129,20 +114,20 @@ int start()
         updateTasksFromFile();
         int size = tests.size();
         for (int i=0; i<size; i++) {
-            int check = tests.at(i).checkForChange();
+            int check = tests.at(i)->checkForChange();
 
             time_t rawtime;
             time (&rawtime);
 
             if(check) {
-                if(tests.at(i).performTest(r)) {
+                if(tests.at(i)->performTest(r)) {
                     onFail(r);
-                    cout << "[ FAIL ] " << tests.at(i).getTestName() << " failed on " << ctime (&rawtime); //ctime ends with a '\n'
+                    cout << "[ FAIL ] " << tests.at(i)->getTestName() << " failed on " << ctime (&rawtime); //ctime ends with a '\n'
                 } else {
                     //Success
-                    cout << "[ PASS ] " << tests.at(i).getTestName() << " passed on " << ctime (&rawtime); //ctime ends with a '\n' 
+                    cout << "[ PASS ] " << tests.at(i)->getTestName() << " passed on " << ctime (&rawtime); //ctime ends with a '\n' 
                 }
-                db.addTestRun(tests.at(i).getID(), tests.at(i).getStoredLastHash(), r.getReturnValue());
+                db.addTestRun(tests.at(i)->getID(), tests.at(i)->getStoredLastHash(), r.getReturnValue());
             }
         }
         sleep(DELAY);

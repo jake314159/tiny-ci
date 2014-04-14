@@ -23,7 +23,7 @@ class test_database
         void initTable();
         int addTask(MakeTest test);
         void listTasks();
-        int getTasks(std::vector<MakeTest> *tests);
+        int getTasks(std::vector<Test*> *tests);
         int addTestRun(int taskID, string commitHash, int returnValue);
         //the paramiter taskID should be an int but in the form of a string
         void listTestRuns(string taskID);

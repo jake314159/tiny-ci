@@ -124,7 +124,7 @@ void test_database::listTasks()
 
 
 static int getTasksCallback(void *testVector, int argc, char **argv, char **azColName){
-    std::vector<MakeTest> *tests = (std::vector<MakeTest>*) testVector;
+    std::vector<MakeTest*> *tests = (std::vector<MakeTest*>*) testVector;
     int i;
     int id;
     string name;
@@ -154,14 +154,14 @@ static int getTasksCallback(void *testVector, int argc, char **argv, char **azCo
         }
         //printf("%s\t", argv[i] ? argv[i] : "NULL");
     }
-    MakeTest t(id, name, dir, url, runTest);
-    t.createNewRepo();
+    MakeTest *t = new MakeTest(id, name, dir, url, runTest);
+    t->createNewRepo();
     tests->push_back(t);
     //printf("\n");
     return 0;
 }
 
-int test_database::getTasks(std::vector<MakeTest> *tests)
+int test_database::getTasks(std::vector<Test*> *tests)
 {
     char *zErrMsg = NULL;
 

@@ -34,14 +34,14 @@ class Test
             this->url = url;
             //pullNewGit(url, dir);
         }
-        ~Test()
+        virtual ~Test()
         {
             testName.clear();
             returnString.clear();
         }
 
         //Methods which should be implemented in the subclasses
-        int performTest(Result&);
+        virtual int performTest(Result&) = 0;
         void saveTest(FILE *fp);
 
 

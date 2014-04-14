@@ -1,14 +1,14 @@
 #include <string>
 #include <fstream>
 #include <streambuf>
-#include "MavenTest.h"
+#include "BashTest.h"
 #include "dir.h"
 
 using namespace std;
 
-#define MVN "mvn package"
+#define BASH "bash "
 
-int MavenTest::performTest(Result &test)
+int BashTest::performTest(Result &test)
 {
     int value;
     // Check if processor is available
@@ -17,7 +17,7 @@ int MavenTest::performTest(Result &test)
     }
 
     //run command
-    std::string cmd = std::string("cd ") + dir + " && " + GIT_PULL + " && " + MVN + " 1> " + TEMP + " 2> " + TEMP;
+    std::string cmd = std::string("cd ") + dir + " && " + GIT_PULL + " && " + BASH + scriptName + " 1> " + TEMP + " 2> " + TEMP;
 
     value = system((char*)cmd.c_str());
 
@@ -40,7 +40,7 @@ int MavenTest::performTest(Result &test)
 }
 
 
-void MavenTest::saveTest(FILE *fp)
+void BashTest::saveTest(FILE *fp)
 {
     cout << "MavenTest saveTest(..) not implemented" << endl;
 }

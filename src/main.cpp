@@ -144,7 +144,7 @@ int handleAddTask(int argc, char *argv[])
         return 0;
     } else if(argc >= 3 && !std::string(argv[2]).compare("make")) {
 
-        if(argc < 4) {
+        if(argc < 5) {
             cout << "Not enough arguments to make a new task" << endl;
             printHelp();
             return 1;
@@ -159,7 +159,7 @@ int handleAddTask(int argc, char *argv[])
         }
         
         bool runTest = false;
-        if(argc > 4 && !std::string(argv[5]).compare("true")) {
+        if(argc > 5 && !std::string(argv[5]).compare("true")) {
             runTest = true;
         }
 
@@ -196,6 +196,39 @@ int handleAddTask(int argc, char *argv[])
         MavenTest t(-1, argv[3], gitRootDir + "/" + argv[3], argv[4]);
         db.addTask(t);
         t.createNewRepo();
+    } else if(argc >= 3 && !std::string(argv[2]).compare("bash")) {
+
+        if(argc < 5) {
+            cout << "Not enough arguments to make a new task" << endl;
+            printHelp();
+            return 1;
+        }
+
+        if(boost::regex_match(argv[3], badInput)) {
+            cout << "Badly formed test name " << argv[3] << ". Unable to continue" << endl;
+            return 10;
+        } else if(boost::regex_match(argv[4], badInput)) {
+            cout << "Badly formed bash file name. Unable to continue" << endl;
+            return 10;
+        } else if(boost::regex_match(argv[5], badInput)) {
+            cout << "Badly formed git url. Unable to continue" << endl;
+            return 10;
+        }
+        
+        /*bool runTest = false;
+        if(argc > 5 && !std::string(argv[5]).compare("true")) {
+            runTest = true;
+        }*/
+
+        cout << "Name:      " << argv[3] << endl;
+        cout << "Directory: " << gitRootDir + "/" + argv[3] << endl;
+        cout << "Bash script:  " << argv[4] << endl << endl;
+        cout << "Git URL:   " << argv[5] << endl;        
+        //cout << "Git url check: " << boost::regex_match(argv[4], badInput) << endl;
+        
+        BashTest t(-1, argv[3], gitRootDir + "/" + argv[3], string(argv[4]), string(argv[5]));
+        db.addTask(t);
+        t.createNewRepo();
     } else {
         cout << "I don't know what '" << argv[2] << "' is sorry" << endl;
         printAddHelp();
@@ -219,12 +252,14 @@ void printAddHelp()
         << "The required arguments are:"                                                    << endl
         << "   <name>:      The name of the new task"                                       << endl
         << "   <gitURL>:    The url for the git repository"                                 << endl
-        << "   <runtest?>:  Should tiny-ci attempt to run any tests? ('true' or 'false')"   << endl << endl
+        << "   <runtest?>:  Should tiny-ci attempt to run any tests? ('true' or 'false')"   << endl
+        << "   <bashFile>:  The name of the bash file to run"                               << endl << endl
 
         << "The command should then be in the form:"                                        << endl
         << "   tiny-ci add make <name> <gitURL>"                                            << endl
         << "   tiny-ci add make <name> <gitURL> <runTest?>"                                 << endl
-        << "   tiny-ci add maven <name> <gitURL>"                                           << endl;
+        << "   tiny-ci add maven <name> <gitURL>"                                           << endl
+        << "   tiny-ci add bash <name> <bashFile> <gitURL>"                                           << endl;
 }
 
 int main(int argc, char *argv[])

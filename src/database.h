@@ -3,6 +3,7 @@
 
 #include "MakeTest.h"
 #include "MavenTest.h"
+#include "BashTest.h"
 
 class test_database
 {
@@ -24,6 +25,7 @@ class test_database
         void initTable();
         int addTask(MakeTest test);
         int addTask(MavenTest test);
+        int addTask(BashTest test);
         void listTasks();
         int getTasks(std::vector<Test*> *tests);
         int addTestRun(int taskID, string commitHash, int returnValue);

@@ -27,17 +27,18 @@ void test_database::initTable()
     char *zErrMsg = NULL;
     std::string sqlTaskTable = "CREATE TABLE IF NOT EXISTS TASKS("  \
          "ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," \
-         "TYPE           CHAR(1)      NOT NULL," \
-         "NAME           VARCHAR(100) NOT NULL," \
-         "GIT_URL        TEXT," \
-         "DIR            TEXT         NOT NULL);";
+         "TYPE     CHAR(1)      NOT NULL," \
+         "NAME     VARCHAR(100) NOT NULL," \
+         "GIT_URL  TEXT," \
+         "DIR      TEXT         NOT NULL,"\
+         "EXTRA    TEXT );";
 
     std::string sqlRunTable = "CREATE TABLE IF NOT EXISTS TEST_RUNS("  \
          "ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," \
-         "TASK           INTEGER      NOT NULL," \
-         "COMMIT_HASH    CHAR(40)     NOT NULL," \
-         "VALUE          INTEGER      NOT NULL," \
-         "TIME           LONG         NOT NULL," \
+         "TASK        INTEGER  NOT NULL," \
+         "COMMIT_HASH CHAR(40) NOT NULL," \
+         "VALUE       INTEGER  NOT NULL," \
+         "TIME        LONG     NOT NULL," \
          "FOREIGN KEY (TASK) REFERENCES TASKS(ID));";
 
     /* Execute SQL statement */
@@ -52,6 +53,25 @@ void test_database::initTable()
         fprintf(stderr, "SQL error: %s\n", zErrMsg);
         sqlite3_free(zErrMsg);
     }
+}
+
+int test_database::addTask(BashTest test)
+{
+    char *zErrMsg = NULL;
+
+    string mode = "b";
+    
+    string sql = "INSERT INTO TASKS (TYPE,NAME,GIT_URL,DIR,EXTRA) "  \
+             "VALUES ('"+mode+"', '"+test.getTestName()+"', '"+test.getURL()+"', '"+test.getDir()+"', '"+test.getScriptName()+"' ); ";
+
+    int rc = sqlite3_exec(db, (char*)sql.c_str(), NULL, 0, &zErrMsg);
+    if( rc != SQLITE_OK ){
+        fprintf(stderr, "SQL error: %s\n", zErrMsg);
+        sqlite3_free(zErrMsg);
+    }else{
+        fprintf(stdout, "Task added successfully\n");
+    }
+    return 0;
 }
 
 int test_database::addTask(MavenTest test)
@@ -118,6 +138,8 @@ static int listTasksCallback(void *NotUsed, int argc, char **argv, char **azColN
             } else {
                 printf("FAIL\t");
             }
+        } else if(!strcmp(azColName[i], "EXTRA")) {
+            //ignore
         } else {
             printf("%s\t", argv[i] ? argv[i] : "NULL");
         }
@@ -150,6 +172,7 @@ static int getTasksCallback(void *testVector, int argc, char **argv, char **azCo
     string name;
     string dir;
     string url;
+    string extra;
     bool runTest;
     for(i=0; i<argc; i++){
         if(!strcmp(azColName[i], "ID")) {
@@ -160,6 +183,8 @@ static int getTasksCallback(void *testVector, int argc, char **argv, char **azCo
             url = argv[i];
         } else if(!strcmp(azColName[i], "DIR")) {
             dir = argv[i];
+        } else if(!strcmp(azColName[i], "EXTRA")) {
+            extra = argv[i] ? argv[i] : "NULL";
         } else if(!strcmp(azColName[i], "TYPE")) {
             type = argv[i];
             if(!strcmp(type, "M")) { //Make with test
@@ -178,6 +203,8 @@ static int getTasksCallback(void *testVector, int argc, char **argv, char **azCo
         t = new MakeTest(id, name, dir, url, runTest);
     } else if(!strcmp(type, "v")) {
         t = new MavenTest(id, name, dir, url);
+    } else if(!strcmp(type, "b")) {
+        t = new BashTest(id, name, dir, extra, url);
     } else {
         cout << "Unsupported test type '" << type << "'" << endl;
     }

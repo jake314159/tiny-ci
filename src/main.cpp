@@ -23,6 +23,8 @@ using namespace std;
 #include "gitTools.h"
 #include "dir.h"
 #include "database.h"
+void printHelp();
+void printAddHelp();
 
 //#include "MakeTest.h"
 
@@ -47,11 +49,11 @@ void initHomeDir()
 int onFail(Result &result)
 {
     //Prints the fail string (here as an example for when we wan't to use it properly)
-    /*cout << endl << "##############################################################" << 
+    cout << endl << "##############################################################" << 
             endl << "The test you have just run has failed! You better check it out" <<
             endl << "##############################################################" << 
             endl;
-    cout << result.getReturnString() << endl << endl;*/
+    cout << result.getReturnString() << endl << endl;
     return 0;
 }
 
@@ -135,6 +137,72 @@ int start()
     return 0;
 }
 
+int handleAddTask(int argc, char *argv[])
+{
+    if(argc >= 3 && !std::string(argv[2]).compare("help")) {
+        printAddHelp();
+        return 0;
+    } else if(argc >= 3 && !std::string(argv[2]).compare("make")) {
+
+        if(argc < 4) {
+            cout << "Not enough arguments to make a new task" << endl;
+            printHelp();
+            return 1;
+        }
+
+        if(boost::regex_match(argv[3], badInput)) {
+            cout << "Badly formed test name " << argv[3] << ". Unable to continue" << endl;
+            return 10;
+        } else if(boost::regex_match(argv[4], badInput)) {
+            cout << "Badly formed git url. Unable to continue" << endl;
+            return 10;
+        }
+        
+        bool runTest = false;
+        if(argc > 4 && !std::string(argv[5]).compare("true")) {
+            runTest = true;
+        }
+
+        cout << "Name:      " << argv[3] << endl;
+        cout << "Directory: " << gitRootDir + "/" + argv[3] << endl;
+        cout << "Git URL:   " << argv[4] << endl;
+        cout << "Run test?:  " << (runTest ? "Yes" : "No") << endl << endl;
+        //cout << "Git url check: " << boost::regex_match(argv[4], badInput) << endl;
+        
+        MakeTest t(-1, argv[3], gitRootDir + "/" + argv[3], argv[4], runTest);
+        db.addTask(t);
+        t.createNewRepo();
+    } else if(argc >= 3 && !std::string(argv[2]).compare("maven")) {
+
+        if(argc < 4) {
+            cout << "Not enough arguments to make a new task" << endl;
+            printHelp();
+            return 1;
+        }
+
+        if(boost::regex_match(argv[3], badInput)) {
+            cout << "Badly formed test name " << argv[3] << ". Unable to continue" << endl;
+            return 10;
+        } else if(boost::regex_match(argv[4], badInput)) {
+            cout << "Badly formed git url. Unable to continue" << endl;
+            return 10;
+        }
+        
+        cout << "Name:      " << argv[3] << endl;
+        cout << "Directory: " << gitRootDir + "/" + argv[3] << endl;
+        cout << "Git URL:   " << argv[4] << endl;
+        //cout << "Git url check: " << boost::regex_match(argv[4], badInput) << endl;
+        
+        MavenTest t(-1, argv[3], gitRootDir + "/" + argv[3], argv[4]);
+        db.addTask(t);
+        t.createNewRepo();
+    } else {
+        cout << "I don't know what '" << argv[2] << "' is sorry" << endl;
+        printAddHelp();
+    }
+    return 0;
+}
+
 void printHelp()    
 {
     cout    << "Did you mean one of these?"                                         << endl << endl
@@ -143,18 +211,20 @@ void printHelp()
             << "tiny-ci list              Lists all the current tasks"              << endl
             << "tiny-ci add name gitURL   Adds a test to run"                       << endl << endl;
 }
-
 void printAddHelp()
 {
     cout 
         << "tiny-ci add can be used to add tasks to be run by the tiny-ci program." << endl << endl
 
-        << "The required arguments are:"                                            << endl
-        << "   <name>:      The name of the new task"                               << endl
-        << "   <gitURL>:    The url for the git repository"                         << endl << endl
+        << "The required arguments are:"                                                    << endl
+        << "   <name>:      The name of the new task"                                       << endl
+        << "   <gitURL>:    The url for the git repository"                                 << endl
+        << "   <runtest?>:  Should tiny-ci attempt to run any tests? ('true' or 'false')"   << endl << endl
 
-        << "The command should then be in the form:"                                << endl
-        << "   tiny-ci add <name> <gitURL>"                                         << endl;
+        << "The command should then be in the form:"                                        << endl
+        << "   tiny-ci add make <name> <gitURL>"                                            << endl
+        << "   tiny-ci add make <name> <gitURL> <runTest?>"                                 << endl
+        << "   tiny-ci add maven <name> <gitURL>"                                           << endl;
 }
 
 int main(int argc, char *argv[])
@@ -176,47 +246,14 @@ int main(int argc, char *argv[])
         start();
     } else if(!std::string(argv[1]).compare("add")) {
         
-        if(argc >= 3 && !std::string(argv[2]).compare("help")) {
-            printAddHelp();
-            return 0;
-        } else if(argc < 4) {
-            cout << "Not enough arguments to make a new task" << endl;
-            printHelp();
-            return 1;
-        }
-
-        if(boost::regex_match(argv[2], badInput)) {
-            cout << "Badly formed test name " << argv[2] << ". Unable to continue" << endl;
-            return 10;
-        } else if(boost::regex_match(argv[3], badInput)) {
-            cout << "Badly formed git url. Unable to continue" << endl;
-            return 10;
-        }
-        
-        bool runTest = false;
-        if(argc > 4 && !std::string(argv[4]).compare("true")) {
-            runTest = true;
-        }
-
-        cout << "Name:      " << argv[2] << endl;
-        cout << "Directory: " << gitRootDir + "/" + argv[2] << endl;
-        cout << "Git URL:   " << argv[3] << endl;
-        cout << "Run test:  " << runTest << endl << endl;
-        cout << "Git url check: " << boost::regex_match(argv[3], badInput) << endl;
-        
-        MakeTest t(-1, argv[2], gitRootDir + "/" + argv[2], argv[3], runTest);
-        db.addTask(t);
-        t.createNewRepo();
+        return handleAddTask(argc, argv);
         //addTaskToStore(t);
     } else if(!std::string(argv[1]).compare("list")) {
-        //db.getTasks(&tests);
-        //listTasks();
-        //db.listTasks(); //TODO this is the only line which should be here
         if(argc >= 3 && !boost::regex_match(argv[2], badInput)) {
             db.listTestRuns(argv[2]);
             //cout << "The last hash was: "<< db.getTestRunsHash(argv[2]) << endl;
         } else {
-            //db.listTasks();
+
             db.getTasks(&tests);
             listTasks();
         }

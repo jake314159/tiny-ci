@@ -54,6 +54,25 @@ void test_database::initTable()
     }
 }
 
+int test_database::addTask(MavenTest test)
+{
+    char *zErrMsg = NULL;
+
+    string mode = "v";
+    
+    string sql = "INSERT INTO TASKS (TYPE,NAME,GIT_URL,DIR) "  \
+             "VALUES ('"+mode+"', '"+test.getTestName()+"', '"+test.getURL()+"', '"+test.getDir()+"' ); ";
+
+    int rc = sqlite3_exec(db, (char*)sql.c_str(), NULL, 0, &zErrMsg);
+    if( rc != SQLITE_OK ){
+        fprintf(stderr, "SQL error: %s\n", zErrMsg);
+        sqlite3_free(zErrMsg);
+    }else{
+        fprintf(stdout, "Task added successfully\n");
+    }
+    return 0;
+}
+
 int test_database::addTask(MakeTest test)
 {
     char *zErrMsg = NULL;
@@ -124,7 +143,8 @@ void test_database::listTasks()
 
 
 static int getTasksCallback(void *testVector, int argc, char **argv, char **azColName){
-    std::vector<MakeTest*> *tests = (std::vector<MakeTest*>*) testVector;
+    std::vector<Test*> *tests = (std::vector<Test*>*) testVector;
+    char* type;
     int i;
     int id;
     string name;
@@ -141,22 +161,30 @@ static int getTasksCallback(void *testVector, int argc, char **argv, char **azCo
         } else if(!strcmp(azColName[i], "DIR")) {
             dir = argv[i];
         } else if(!strcmp(azColName[i], "TYPE")) {
-            if(!strcmp(argv[i], "M")) { //Make with test
+            type = argv[i];
+            if(!strcmp(type, "M")) { //Make with test
                 runTest = true;
-            } else if(!strcmp(argv[i], "m")) { //Make without test
+            } else if(!strcmp(type, "m")) { //Make without test
                 runTest = false;
-            } else {
-                cout << "Unsupported test type: " << argv[i] << endl;
-                return 1;
             }
         } else {
             printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
         }
         //printf("%s\t", argv[i] ? argv[i] : "NULL");
     }
-    MakeTest *t = new MakeTest(id, name, dir, url, runTest);
-    t->createNewRepo();
-    tests->push_back(t);
+
+    Test *t = 0;
+    if(!strcmp(type, "M") || !strcmp(type, "m")) {
+        t = new MakeTest(id, name, dir, url, runTest);
+    } else if(!strcmp(type, "v")) {
+        t = new MavenTest(id, name, dir, url);
+    } else {
+        cout << "Unsupported test type '" << type << "'" << endl;
+    }
+    if(t != 0) {
+        t->createNewRepo();
+        tests->push_back(t);
+    }
     //printf("\n");
     return 0;
 }

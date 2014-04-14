@@ -1,3 +1,6 @@
+#ifndef __TEST_H_INCLUDED_
+#define __TEST_H_INCLUDED_ 1
+
 #include <iostream>
 #include <string>
 
@@ -101,3 +104,4 @@ class Test
             return id;
         }
 };
+#endif

@@ -16,8 +16,8 @@ BOOST_LIB_DIR=/usr/local/lib
 all: $(BIN)/tiny-ci size
 check: tester
 
-$(BIN)/tiny-ci: $(BIN)/main.o $(BIN)/Test.o $(BIN)/MakeTest.o $(BIN)/Result.o $(BIN)/gitTools.o $(BIN)/database.o
-	$(CC) -I $(BOOST_INCLUDE_DIR) -L $(BOOST_LIB_DIR) -Wl,-rpath,$(BOOST_LIB_DIR) $(CCFLAGS) $(BIN)/main.o $(BIN)/Test.o $(BIN)/MakeTest.o $(BIN)/Result.o $(BIN)/gitTools.o $(BIN)/database.o -lboost_regex -lsqlite3 -o $(BIN)/$(FILE_OUT)
+$(BIN)/tiny-ci: $(BIN)/main.o $(BIN)/Test.o $(BIN)/MakeTest.o $(BIN)/MavenTest.o $(BIN)/Result.o $(BIN)/gitTools.o $(BIN)/database.o
+	$(CC) -I $(BOOST_INCLUDE_DIR) -L $(BOOST_LIB_DIR) -Wl,-rpath,$(BOOST_LIB_DIR) $(CCFLAGS) $(BIN)/main.o $(BIN)/Test.o $(BIN)/MakeTest.o $(BIN)/MavenTest.o $(BIN)/Result.o $(BIN)/gitTools.o $(BIN)/database.o -lboost_regex -lsqlite3 -o $(BIN)/$(FILE_OUT)
 
 $(BIN)/main.o: $(SRC)/main.cpp $(BIN)
 	$(CC) $(CCFLAGS) -c $(SRC)/main.cpp -o $(BIN)/main.o
@@ -27,6 +27,9 @@ $(BIN)/Test.o: $(SRC)/Test.cpp $(BIN)
 
 $(BIN)/MakeTest.o: $(SRC)/MakeTest.cpp $(BIN)
 	$(CC) $(CCFLAGS) -c $(SRC)/MakeTest.cpp -o $(BIN)/MakeTest.o
+
+$(BIN)/MavenTest.o: $(SRC)/MavenTest.cpp $(BIN)
+	$(CC) $(CCFLAGS) -c $(SRC)/MavenTest.cpp -o $(BIN)/MavenTest.o
 
 $(BIN)/Result.o: $(SRC)/Result.cpp $(BIN)
 	$(CC) $(CCFLAGS) -c $(SRC)/Result.cpp -o $(BIN)/Result.o

@@ -2,6 +2,7 @@
 #include <sqlite3.h>
 
 #include "MakeTest.h"
+#include "MavenTest.h"
 
 class test_database
 {
@@ -22,6 +23,7 @@ class test_database
         void openConnection();
         void initTable();
         int addTask(MakeTest test);
+        int addTask(MavenTest test);
         void listTasks();
         int getTasks(std::vector<Test*> *tests);
         int addTestRun(int taskID, string commitHash, int returnValue);

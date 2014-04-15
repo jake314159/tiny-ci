@@ -24,9 +24,5 @@ tiny-ci help
 TODO
 -------
 
-+ Add support for **bash** tests
-+ Add support for **maven** tests
 + Add email alerts
-+ Store histories of tests
-+ Consider moving to a database rather than files (SQLite)
 + Store build histories (with compiled files accessable?)

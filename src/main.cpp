@@ -89,7 +89,7 @@ void listTasks()
     updateTasksFromFile();
     int size = tests.size();
     for(int i=0; i<size; i++) {
-        //Test *test = tests.at(i);
+        Test *test = tests.at(i);
 
         //convert the ID to a string
         stringstream ss;

@@ -89,8 +89,13 @@ void listTasks()
     updateTasksFromFile();
     int size = tests.size();
     for(int i=0; i<size; i++) {
-        Test *test = tests.at(i);
-        TestMode mode = test->getMode();
+        //Test *test = tests.at(i);
+
+        //convert the ID to a string
+        stringstream ss;
+        ss << test->getID();
+
+        TestMode mode = db.getLastTestResult( ss.str() );//test->getMode();
         if(mode == PASS) {
             cout << "[ PASS ]";
         } else if(mode == FAIL) {
@@ -288,7 +293,6 @@ int main(int argc, char *argv[])
             db.listTestRuns(argv[2]);
             //cout << "The last hash was: "<< db.getTestRunsHash(argv[2]) << endl;
         } else {
-
             db.getTasks(&tests);
             listTasks();
         }

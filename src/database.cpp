@@ -282,3 +282,30 @@ void test_database::listTestRuns(string taskID)
     }
 }
 
+TestMode TestMode_for_callback;
+static int getTestResultCallback(void *stringTarget, int argc, char **argv, char **azColName){
+    //TestMode_for_callback = argv[0];
+    if(!strcmp(argv[0], "0")) {
+        TestMode_for_callback = PASS;
+    } else {
+        TestMode_for_callback = FAIL;
+    }
+    return 0;
+}
+TestMode test_database::getLastTestResult(string taskID)
+{
+    TestMode_for_callback = UNTESTED;
+    char *zErrMsg = NULL;
+    
+    newHash_for_callback = "";
+
+    string sql = "SELECT VALUE from TEST_RUNS WHERE TASK='"+ taskID +"' ORDER BY ID DESC LIMIT 1";
+
+    int rc = sqlite3_exec(db, (char*)sql.c_str(), getTestResultCallback, 0, &zErrMsg);
+    if( rc != SQLITE_OK ){
+        fprintf(stderr, "SQL error: %s\n", zErrMsg);
+        sqlite3_free(zErrMsg);
+    }
+    return TestMode_for_callback;
+}
+

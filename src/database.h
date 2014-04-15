@@ -32,6 +32,7 @@ class test_database
         //the paramiter taskID should be an int but in the form of a string
         void listTestRuns(string taskID);
         string getTestRunsHash(string taskID);
+        TestMode getLastTestResult(string taskID);
 
         int isOpen()
         {

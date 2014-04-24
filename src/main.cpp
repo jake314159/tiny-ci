@@ -15,7 +15,7 @@
 #define DELAY 60
 
 //Regex to check for things which shouldn't be passed to a bash shell
-boost::regex badInput(".*(>|<|&&|\\|DELETE|INSERT).*");
+boost::regex badInput(".*(>|<|&&|\\||DELETE|INSERT).*");
 
 using namespace std;
 
@@ -268,8 +268,23 @@ void printAddHelp()
         << "   tiny-ci add bash <name> <bashFile> <gitURL>"                                           << endl;
 }
 
+bool checkArgs(int argc, char *argv[])
+{
+    bool result = true;
+    for(int i=1; i<argc; i++) {
+        if(boost::regex_match(argv[i], badInput)) {
+            cout << "Badly formed input '" << argv[i] << "'. Unable to continue" << endl;
+            result = false;
+        }
+    }
+    return result;
+}
+
 int main(int argc, char *argv[])
 {
+    if(!checkArgs(argc, argv)) {
+        return 101;
+    }
     initHomeDir();
     db.openConnection();
     db.initTable();

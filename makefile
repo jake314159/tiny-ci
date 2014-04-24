@@ -19,32 +19,29 @@ check: tester
 $(BIN)/tiny-ci: $(BIN)/main.o $(BIN)/Test.o $(BIN)/MakeTest.o $(BIN)/MavenTest.o $(BIN)/BashTest.o $(BIN)/Result.o $(BIN)/gitTools.o $(BIN)/database.o
 	$(CC) -I $(BOOST_INCLUDE_DIR) -L $(BOOST_LIB_DIR) -Wl,-rpath,$(BOOST_LIB_DIR) $(CCFLAGS) $(BIN)/main.o $(BIN)/Test.o $(BIN)/MakeTest.o $(BIN)/MavenTest.o $(BIN)/BashTest.o $(BIN)/Result.o $(BIN)/gitTools.o $(BIN)/database.o -lboost_regex -lsqlite3 -o $(BIN)/$(FILE_OUT)
 
-$(BIN)/main.o: $(SRC)/main.cpp $(BIN)
+$(BIN)/main.o: $(SRC)/main.cpp
 	$(CC) $(CCFLAGS) -c $(SRC)/main.cpp -o $(BIN)/main.o
 
-$(BIN)/Test.o: $(SRC)/Test.cpp $(BIN)
+$(BIN)/Test.o: $(SRC)/Test.cpp
 	$(CC) $(CCFLAGS) -c $(SRC)/Test.cpp -o $(BIN)/Test.o
 
-$(BIN)/MakeTest.o: $(SRC)/MakeTest.cpp $(BIN)
+$(BIN)/MakeTest.o: $(SRC)/MakeTest.cpp
 	$(CC) $(CCFLAGS) -c $(SRC)/MakeTest.cpp -o $(BIN)/MakeTest.o
 
-$(BIN)/MavenTest.o: $(SRC)/MavenTest.cpp $(BIN)
+$(BIN)/MavenTest.o: $(SRC)/MavenTest.cpp
 	$(CC) $(CCFLAGS) -c $(SRC)/MavenTest.cpp -o $(BIN)/MavenTest.o
 
-$(BIN)/BashTest.o: $(SRC)/BashTest.cpp $(BIN)
+$(BIN)/BashTest.o: $(SRC)/BashTest.cpp
 	$(CC) $(CCFLAGS) -c $(SRC)/BashTest.cpp -o $(BIN)/BashTest.o
 
-$(BIN)/Result.o: $(SRC)/Result.cpp $(BIN)
+$(BIN)/Result.o: $(SRC)/Result.cpp
 	$(CC) $(CCFLAGS) -c $(SRC)/Result.cpp -o $(BIN)/Result.o
 
-$(BIN)/gitTools.o: $(SRC)/gitTools.cpp $(BIN)
+$(BIN)/gitTools.o: $(SRC)/gitTools.cpp
 	$(CC) $(CCFLAGS) -c $(SRC)/gitTools.cpp -o $(BIN)/gitTools.o
 
-$(BIN)/database.o: $(SRC)/database.cpp $(BIN)
+$(BIN)/database.o: $(SRC)/database.cpp
 	$(CC) $(CCFLAGS) -c $(SRC)/database.cpp -o $(BIN)/database.o
-
-$(BIN): 
-	mkdir -p $(BIN)
 
 tester: all tester.o testbindir
 	$(CC) testbin/tester.o $(BIN)/MakeTest.o $(BIN)/gitTools.o $(BIN)/Result.o -o testbin/tester

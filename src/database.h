@@ -27,8 +27,10 @@ class test_database
         int addTask(MavenTest test);
         int addTask(BashTest test);
         void listTasks();
+        void listTask(string ID);
         int getTasks(std::vector<Test*> *tests);
         int addTestRun(int taskID, string commitHash, int returnValue);
+        void deleteTask(string taskID);
         //the paramiter taskID should be an int but in the form of a string
         void listTestRuns(string taskID);
         string getTestRunsHash(string taskID);

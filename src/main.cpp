@@ -15,7 +15,7 @@
 #define DELAY 60
 
 //Regex to check for things which shouldn't be passed to a bash shell
-boost::regex badInput(".*(>|<|&&|\\|).*");
+boost::regex badInput(".*(>|<|&&|\\|DELETE|INSERT).*");
 
 using namespace std;
 
@@ -247,6 +247,7 @@ void printHelp()
 
             << "tiny-ci start             Starts the server program"                << endl
             << "tiny-ci list              Lists all the current tasks"              << endl
+            << "tiny-ci remove ID         Removes the task with the ID given"       << endl
             << "tiny-ci add name gitURL   Adds a test to run"                       << endl << endl;
 }
 void printAddHelp()
@@ -288,6 +289,28 @@ int main(int argc, char *argv[])
         
         return handleAddTask(argc, argv);
         //addTaskToStore(t);
+    } else if(!std::string(argv[1]).compare("remove")) {
+        if(argc<3) {
+            cout << "Not enough arguments";
+            printHelp();
+            return 1;
+        } else if(boost::regex_match(argv[2], badInput)) {
+            cout << "Badly formed input " << argv[2] << ". Unable to continue" << endl;
+            return 13;
+        }
+
+        cout << endl << endl << "You are about to delete the task shown below:" << endl;
+        db.listTask(argv[2]);
+        cout << endl << "Are you sure you want to delete this (y/n)? ";
+        string response = "n";
+        cin >> response;
+        if(!response.compare("y")) {
+            db.deleteTask(argv[2]);
+            cout << "Task deleted" << endl;
+        } else {
+            cout << "Delete canceled" << endl;
+        }
+
     } else if(!std::string(argv[1]).compare("list")) {
         if(argc >= 3 && !boost::regex_match(argv[2], badInput)) {
             db.listTestRuns(argv[2]);

@@ -163,6 +163,19 @@ void test_database::listTasks()
     }
 }
 
+void test_database::listTask(string ID)
+{
+    char *zErrMsg = NULL;
+
+    string sql = "SELECT * from TASKS WHERE ID='" + ID + "'";
+
+    int rc = sqlite3_exec(db, (char*)sql.c_str(), listTasksCallback, 0, &zErrMsg);
+    if( rc != SQLITE_OK ){
+        fprintf(stderr, "SQL error: %s\n", zErrMsg);
+        sqlite3_free(zErrMsg);
+    }
+}
+
 
 static int getTasksCallback(void *testVector, int argc, char **argv, char **azColName){
     std::vector<Test*> *tests = (std::vector<Test*>*) testVector;
@@ -309,3 +322,16 @@ TestMode test_database::getLastTestResult(string taskID)
     return TestMode_for_callback;
 }
 
+//the paramiter taskID should be an int but in the form of a string
+void test_database::deleteTask(string taskID)
+{
+    char *zErrMsg = NULL;
+
+    string sql = "DELETE FROM TASKS WHERE ID='"+taskID+"'";
+
+    int rc = sqlite3_exec(db, (char*)sql.c_str(), NULL, 0, &zErrMsg);
+    if( rc != SQLITE_OK ){
+        fprintf(stderr, "SQL error: %s\n", zErrMsg);
+        sqlite3_free(zErrMsg);
+    }
+}

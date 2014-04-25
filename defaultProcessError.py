@@ -1,8 +1,25 @@
 #! /usr/local/bin/python
+import sys
+import os
+import re
 
-#SMTPClient mailc("my.inbox.com",465,"tiny-ci-test@inbox.com","tinytestpassword");
-#    cout << mailc.Send("tiny-ci-test@inbox.com","tiny-ci-test@inbox.com","test","Hello from C++ SMTP Client!") << endl;
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# This ProcessError.py file as part of tiny-ci will     #
+# Be run for every failed test                          #
+#                                                       #
+# It is up to the user to decide how the error should   #
+# be handled in this script                             #
+#                                                       #
+# By default the script is set up to send an email      #
+# with the error message (altough the SMTP settings     #
+# first needs to be filled in)                          #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
+# Here is the avalible information about the failure #
+testName = sys.argv[1]
+errorMessage = sys.argv[2]
+
+# SMTP settings #
 SMTPserver = ''
 sender =     ''
 destination = ['']
@@ -10,28 +27,25 @@ destination = ['']
 USERNAME = ""
 PASSWORD = ""
 
+
 # typical values for text_subtype are plain, html, xml
 text_subtype = 'plain'
 
-
 content="""\
-Test message
-"""
+A tiny-ci test has failed\n
+""" + errorMessage
 
-subject="Sent from Python"
+subject="Failed tiny-ci test '" + testName + "'";
 
-import sys
-import os
-import re
 
-from smtplib import SMTP_SSL as SMTP       # this invokes the secure SMTP protocol (port 465, uses SSL)
-# from smtplib import SMTP                  # use this for standard SMTP protocol   (port 25, no encryption)
+## SEND THE EMAIL ##
+from smtplib import SMTP_SSL as SMTP
 from email.MIMEText import MIMEText
 
 try:
     msg = MIMEText(content, text_subtype)
-    msg['Subject']=       subject
-    msg['From']   = sender # some SMTP servers will do this automatically, not all
+    msg['Subject'] = subject
+    msg['From'] = sender
 
     conn = SMTP(SMTPserver)
     conn.set_debuglevel(False)
@@ -42,4 +56,4 @@ try:
         conn.close()
 
 except Exception, exc:
-    sys.exit( "mail failed; %s" % str(exc) ) # give a error message
+    sys.exit( "mail failed; %s" % str(exc) )

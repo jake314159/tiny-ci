@@ -46,7 +46,7 @@ void initHomeDir()
     //cout << "git root dir " << gitRootDir << endl;
 }
 
-int onFail(Result &result)
+int onFail(string testName, Result &result)
 {
     //Prints the fail string (here as an example for when we wan't to use it properly)
     cout << endl << "##############################################################" << 
@@ -61,7 +61,7 @@ int onFail(Result &result)
     }
 
     //run command
-    std::string cmd = std::string("python ") + homedir + "/" + HOME_DIR + "/processError.py";
+    std::string cmd = std::string("python ") + homedir + "/" + HOME_DIR + "/processError.py '" + testName + "' '" + result.getReturnString() + "'";
     cout << "Running " << cmd << endl;
 
     system((char*)cmd.c_str());
@@ -140,7 +140,7 @@ int start()
 
             if(check) {
                 if(tests.at(i)->performTest(r)) {
-                    onFail(r);
+                    onFail(tests.at(i)->getTestName(), r);
                     cout << "[ FAIL ] " << tests.at(i)->getTestName() << " failed on " << ctime (&rawtime); //ctime ends with a '\n'
                 } else {
                     //Success
@@ -354,7 +354,7 @@ int main(int argc, char *argv[])
         Result r;
         r.setReturnValue(1);
         r.setReturnString("An example of a failed test\n\nAn example of a failed test\n");
-        onFail(r);
+        onFail("Example-Test", r);
     } else {
         cout << "Incorrect argument!" << endl;
         printHelp();

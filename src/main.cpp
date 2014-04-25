@@ -14,8 +14,8 @@
 //delay between checks in seconds
 #define DELAY 60
 
-//Regex to check for things which shouldn't be passed to a bash shell
-boost::regex badInput(".*(>|<|&&|\\||DELETE|INSERT).*");
+//Regex to check for things which shouldn't be passed to a bash shell or SQL
+boost::regex badInput(".*(>|<|&&|\\||DELETE|INSERT|UPDATE|=|DROP|;).*");
 
 using namespace std;
 
@@ -54,6 +54,18 @@ int onFail(Result &result)
             endl << "##############################################################" << 
             endl;
     cout << result.getReturnString() << endl << endl;
+
+    // Check if processor is available
+    if (!system(NULL)) {
+        exit (EXIT_FAILURE);
+    }
+
+    //run command
+    std::string cmd = std::string("python ") + homedir + "/" + HOME_DIR + "/processError.py";
+    cout << "Running " << cmd << endl;
+
+    system((char*)cmd.c_str());
+
     return 0;
 }
 
@@ -265,7 +277,7 @@ void printAddHelp()
         << "   tiny-ci add make <name> <gitURL>"                                            << endl
         << "   tiny-ci add make <name> <gitURL> <runTest?>"                                 << endl
         << "   tiny-ci add maven <name> <gitURL>"                                           << endl
-        << "   tiny-ci add bash <name> <bashFile> <gitURL>"                                           << endl;
+        << "   tiny-ci add bash <name> <bashFile> <gitURL>"                                 << endl;
 }
 
 bool checkArgs(int argc, char *argv[])
@@ -282,9 +294,11 @@ bool checkArgs(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
+    //Check that all inputs don't have anything banned
     if(!checkArgs(argc, argv)) {
         return 101;
     }
+
     initHomeDir();
     db.openConnection();
     db.initTable();
@@ -334,6 +348,13 @@ int main(int argc, char *argv[])
             db.getTasks(&tests);
             listTasks();
         }
+    } else if(!std::string(argv[1]).compare("dev-fail")) {
+        // Unpublished dev option which runs a fake test fail
+        // Can be used to test that fails are handled as expected
+        Result r;
+        r.setReturnValue(1);
+        r.setReturnString("An example of a failed test\n\nAn example of a failed test\n");
+        onFail(r);
     } else {
         cout << "Incorrect argument!" << endl;
         printHelp();

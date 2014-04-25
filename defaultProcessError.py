@@ -28,7 +28,6 @@ USERNAME = ""
 PASSWORD = ""
 
 
-# typical values for text_subtype are plain, html, xml
 text_subtype = 'plain'
 
 content="""\

@@ -20,9 +20,3 @@ For help on the options avalible you can run
 tiny-ci help
 ```
 
-
-TODO
--------
-
-+ Add email alerts
-+ Store build histories (with compiled files accessable?)

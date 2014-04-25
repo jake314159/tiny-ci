@@ -48,13 +48,6 @@ void initHomeDir()
 
 int onFail(string testName, Result &result)
 {
-    //Prints the fail string (here as an example for when we wan't to use it properly)
-    cout << endl << "##############################################################" << 
-            endl << "The test you have just run has failed! You better check it out" <<
-            endl << "##############################################################" << 
-            endl;
-    cout << result.getReturnString() << endl << endl;
-
     // Check if processor is available
     if (!system(NULL)) {
         exit (EXIT_FAILURE);
@@ -62,11 +55,8 @@ int onFail(string testName, Result &result)
 
     //run command
     std::string cmd = std::string("python ") + homedir + "/" + HOME_DIR + "/processError.py '" + testName + "' '" + result.getReturnString() + "'";
-    cout << "Running " << cmd << endl;
 
-    system((char*)cmd.c_str());
-
-    return 0;
+    return system((char*)cmd.c_str());
 }
 
 void addTaskToStore(MakeTest &t)

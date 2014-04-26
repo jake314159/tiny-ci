@@ -9,6 +9,7 @@ Compile instructions
 The files can be compiled using make with the following command.
 
 ```bash
+./configure.sh
 make setup
 ```
 
